@@ -29,21 +29,20 @@
         <button v-if="canOpen && !bankFull" class="mt-1 btn btn-primary btn-sm" @click="openAll">Open All {{count}}!</button>
         <button v-if="canOpen" class="mt-1 btn btn-primary btn-sm" @click="viewOdds">View Odds</button>
         <div v-if="item.sellPrice" class="mt-1">
-          <inventory-sell :itemId="itemId" :count="1" :totalCount="count" />
-          <inventory-sell :itemId="itemId" :count="10" :totalCount="count" />
-          <inventory-sell :itemId="itemId" :count="100" :totalCount="count" />
-          <inventory-sell :itemId="itemId" :count="1000" :totalCount="count" />
+          <inventory-sell :itemId="itemId" :count="1" :totalCount="count" v-if="count != 1" />
+          <inventory-sell :itemId="itemId" :count="10" :totalCount="count" v-if="count != 10" />
+          <inventory-sell :itemId="itemId" :count="100" :totalCount="count" v-if="count != 100" />
+          <inventory-sell :itemId="itemId" :count="1000" :totalCount="count" v-if="count != 1000" />
           <inventory-sell
             :itemId="itemId"
             :count="count-1"
             :totalCount="count"
-            v-if="allButOne && count-1 >  1"
+            v-if="allButOne && count - 1 > 1 && count - 1 != 10 && count - 1 != 100 && count - 1 != 1000"
           />
           <inventory-sell
             :itemId="itemId"
             :count="count"
             :totalCount="count"
-            v-if="count != 1 && count != 10 && count != 100 && count != 1000"
           />
         </div>
         <span v-else class="mt-1">Can't be sold</span>
