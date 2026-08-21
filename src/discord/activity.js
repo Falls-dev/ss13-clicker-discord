@@ -8,7 +8,9 @@ export const discordState = Vue.observable({
 	active: false,
 	ready: false,
 	user: null,
-	layoutMode: LAYOUT_FOCUSED
+	sessionToken: "",
+	layoutMode: LAYOUT_FOCUSED,
+	debug: false
 });
 
 let discordSdk = null;
@@ -40,6 +42,11 @@ if (typeof document !== "undefined" && isDiscordActivity()) {
 }
 
 async function discordFetch(path, options) {
+	const opts = Object.assign({}, options || {});
+	opts.headers = Object.assign({}, opts.headers || {});
+	if (discordState.sessionToken && !opts.headers.Authorization) {
+		opts.headers.Authorization = "Bearer " + discordState.sessionToken;
+	}
 	const urls = [path];
 	if (path.indexOf("/.proxy/") !== 0) {
 		urls.push("/.proxy" + path);
@@ -47,14 +54,22 @@ async function discordFetch(path, options) {
 	let lastError = null;
 	for (let i = 0; i < urls.length; i++) {
 		try {
-			const response = await fetch(urls[i], options);
-			if (response.ok) return response;
+			const response = await fetch(urls[i], opts);
+			if (response.ok || response.status === 409) return response;
 			lastError = new Error(path + " -> " + response.status);
 		} catch (err) {
 			lastError = err;
 		}
 	}
 	throw lastError || new Error("Request failed: " + path);
+}
+
+export function apiFetch(path, options) {
+	return discordFetch(path, options);
+}
+
+export function getSessionToken() {
+	return discordState.sessionToken || "";
 }
 
 async function resolveClientId() {
@@ -175,10 +190,31 @@ async function authenticateUser(clientId) {
 	if (!payload || !payload.access_token) {
 		throw new Error("Token exchange returned no access_token");
 	}
+	if (payload.session_token) {
+		discordState.sessionToken = payload.session_token;
+	}
+	if (payload.user) {
+		discordState.user = payload.user;
+	}
 
 	return discordSdk.commands.authenticate({
 		access_token: payload.access_token
 	});
+}
+
+export async function startDebugSession(userId) {
+	const response = await discordFetch("/api/debug/session", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ userId: userId || "debug-local" })
+	});
+	const payload = await response.json();
+	if (payload.session_token) {
+		discordState.sessionToken = payload.session_token;
+		discordState.user = payload.user || { id: userId || "debug-local", username: "debug" };
+		discordState.debug = true;
+	}
+	return payload;
 }
 
 export async function openExternalLink(url) {
