@@ -1,5 +1,6 @@
 <template>
   <div id="app" :class="{'dark-mode' : darkMode, 'discord-pip-mode': isPip}">
+    <debug-panel v-if="debugEnabled" />
     <discord-pip v-if="isPip" />
     <template v-else>
       <toast-container />
@@ -21,6 +22,7 @@ import ModalUpdate from "@/components/Modals/ModalUpdate";
 import ModalWelcomeBack from "@/components/Modals/ModalWelcomeBack";
 import PanelsContainer from "@/components/Panels/PanelsContainer";
 import DiscordPip from "@/discord/DiscordPip.vue";
+import DebugPanel from "@/debug/DebugPanel.vue";
 import { discordState, LAYOUT_FOCUSED } from "@/discord/activity";
 import { mapGetters, mapMutations } from "vuex";
 export default {
@@ -30,7 +32,8 @@ export default {
     Sidebar,
     ContentWrapper,
     PanelsContainer,
-    DiscordPip
+    DiscordPip,
+    DebugPanel
   },
   computed: {
     ...mapGetters(["welcomeMessageSeen"]),
@@ -39,6 +42,9 @@ export default {
     },
     isPip() {
       return discordState.active && discordState.layoutMode !== LAYOUT_FOCUSED;
+    },
+    debugEnabled() {
+      return discordState.debug;
     }
   },
   methods: {
