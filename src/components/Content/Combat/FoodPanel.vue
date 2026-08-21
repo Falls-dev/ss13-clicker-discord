@@ -14,7 +14,7 @@
             <img class="food-icon" :src="food.icon" />
             <span>+{{food.healAmount}} HP</span>
           </div>
-          <span v-else>No food</span>
+          <span v-else>{{ $t('combat.noFood') }}</span>
         </button>
 
         <item-popover v-if="food" :target="id" placement="left" :itemId="foodId" />
@@ -32,7 +32,7 @@
           class="custom-control-input"
           id="autoEatEnabled"
         />
-        <label class="custom-control-label" for="autoEatEnabled">Auto-Eat</label>
+        <label class="custom-control-label" for="autoEatEnabled">{{ $t('combat.autoEat') }}</label>
       </div>
     </div>
 
@@ -40,7 +40,7 @@
       v-if="food"
       class="mb-2 mt-2 food-cooldown black-background"
       :progress="foodCooldownProgress"
-      :text="'Food Cooldown: '+foodCooldown +'s'"
+      :text="$t('combat.foodCooldown', { time: foodCooldown })"
       :customClass="'bg-warning'"
     />
   </div>

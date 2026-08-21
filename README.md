@@ -62,7 +62,7 @@ Saves are stored in local SQLite (`data/saves.sqlite`) keyed by Discord user ID,
 
 Language: EN/RU toggle in the sidebar and Settings.
 
-Debug overlay: set `DEBUG=1` in `.env` or open with `?debug=1`.
+Debug overlay: set `LOCAL_PLAYER=1` and `DEBUG=1` in `.env` (debug is ignored if `LOCAL_PLAYER` is off). Browser play also requires `LOCAL_PLAYER=1`; otherwise the game is Discord Activity only.
 
 Russian setup notes: `README_RU.md`.
 

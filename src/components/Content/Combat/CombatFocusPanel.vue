@@ -33,42 +33,39 @@ export default {
       return this.$store.getters["combat/focus"];
     },
     focuses() {
-      let damageDealtText =
-        this.$store.getters["combat/xpRatio"] * 100 +
-        "% of damage dealt is gained as ";
-      let isRanged = this.$store.getters["combat/isRanged"];
-      let focuses = [
+      const percent = this.$store.getters["combat/xpRatio"] * 100;
+      const isRanged = this.$store.getters["combat/isRanged"];
+      const powerJob = isRanged ? "rangedPower" : "meleePower";
+      return [
         {
-          name: "Precision",
+          name: this.$t("jobs.precision"),
           id: "precision",
-          bonus: "+5 precision bonus",
-          description: damageDealtText + "precision XP",
+          bonus: this.$t("combat.focusBonus", { stat: this.$t("jobs.precision") }),
+          description: this.$t("combat.focusXp", { percent, stat: this.$t("jobs.precision") }),
           icon: require("@/assets/art/combat/precision.png")
         },
         {
-          name: "Power",
+          name: this.$t("combat.power"),
           id: "power",
-          bonus: "+5 power bonus",
-          description:
-            damageDealtText + (isRanged ? "ranged" : "melee") + " power XP",
+          bonus: this.$t("combat.focusBonus", { stat: this.$t("combat.power") }),
+          description: this.$t("combat.focusXp", { percent, stat: this.$t("jobs." + powerJob) }),
           icon: isRanged ? rangedPowerIcon : meleePowerIcon
         },
         {
-          name: "Evasion",
+          name: this.$t("jobs.evasion"),
           id: "evasion",
-          bonus: "+5 evasion bonus",
-          description: damageDealtText + "evasion XP",
+          bonus: this.$t("combat.focusBonus", { stat: this.$t("jobs.evasion") }),
+          description: this.$t("combat.focusXp", { percent, stat: this.$t("jobs.evasion") }),
           icon: require("@/assets/art/combat/black_shoes.png")
         },
         {
-          name: "Command",
+          name: this.$t("jobs.command"),
           id: "command",
-          bonus: "+5 command bonus",
-          description: damageDealtText + "command XP",
+          bonus: this.$t("combat.focusBonus", { stat: this.$t("jobs.command") }),
+          description: this.$t("combat.focusXp", { percent, stat: this.$t("jobs.command") }),
           icon: require("@/assets/art/combat/command.png")
         }
       ];
-      return focuses;
     }
   }
 };

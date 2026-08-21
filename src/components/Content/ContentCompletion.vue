@@ -20,7 +20,7 @@
             @click="itemsExpanded = !itemsExpanded"
           >
             <img :src="require('@/assets/art/misc/eyes.png')" class="mr-2" />
-            <span class="mr-1">ITEMS</span>
+            <span class="mr-1">{{ $t('completion.items') }}</span>
             <span class="primary-bubble">{{$store.getters['completion/itemPercent']}}%</span>
           </div>
           <div
@@ -43,8 +43,8 @@
                 :customClass="$store.getters['settings/darkModeClass']"
               >
                 <div class="d-flex flex-column align-items-center">
-                  <h6>{{entry[1].name}}</h6>
-                  <span>Found: {{getItem(entry[0])}}</span>
+                  <h6>{{$itemName(entry[0], entry[1].name)}}</h6>
+                  <span>{{ $t('completion.found', { count: getItem(entry[0]) }) }}</span>
                 </div>
               </b-popover>
             </div>
@@ -57,7 +57,7 @@
             @click="enemiesExpanded = !enemiesExpanded"
           >
             <img :src="require('@/assets/art/misc/eyes.png')" class="mr-2" />
-            <span class="mr-1">ENEMIES</span>
+            <span class="mr-1">{{ $t('completion.enemies') }}</span>
             <span class="primary-bubble">{{$store.getters['completion/enemyPercent']}}%</span>
           </div>
           <div
@@ -80,8 +80,8 @@
                 :customClass="$store.getters['settings/darkModeClass']"
               >
                 <div class="d-flex flex-column align-items-center">
-                  <h6>{{entry[1].name}}</h6>
-                  <span>Killed: {{getEnemy(entry[0])}}</span>
+                  <h6>{{$enemyName(entry[0], entry[1].name)}}</h6>
+                  <span>{{ $t('completion.killed', { count: getEnemy(entry[0]) }) }}</span>
                 </div>
               </b-popover>
             </div>
@@ -95,12 +95,12 @@
             @click="jobsExpanded = !jobsExpanded"
           >
             <img :src="require('@/assets/art/misc/eyes.png')" class="mr-2" />
-            <span class="mr-1">JOBS</span>
+            <span class="mr-1">{{ $t('completion.jobs') }}</span>
             <span class="primary-bubble">{{$store.getters['completion/jobPercent']}}%</span>
           </div>
           <div v-if="jobsExpanded" class="content-block content-block-bottom d-flex flex-row">
             <div class="d-flex flex-column align-items-center w-50">
-              <h5 class="pt-2">Levels</h5>
+              <h5 class="pt-2">{{ $t('completion.levels') }}</h5>
               <div class="jobs">
                 <div v-for="(job, index) in jobsLevelSorted" :key="index" class="bar my-1">
                   <div
@@ -118,7 +118,7 @@
               </div>
             </div>
             <div class="d-flex flex-column align-items-center w-50">
-              <h5 class="pt-2">Time</h5>
+              <h5 class="pt-2">{{ $t('completion.time') }}</h5>
               <div class="jobs">
                 <div v-for="(job, index) in jobsTimeSorted" :key="index" class="bar my-1">
                   <div

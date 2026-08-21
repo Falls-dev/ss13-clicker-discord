@@ -76,14 +76,14 @@
           <div class="content-block">
             <div class="d-flex flex-row align-items-center">
               <img :src="require('@/assets/art/bartending/upgrade1.png')" />
-              <h5 class="mb-1">Upgrades</h5>
+              <h5 class="mb-1">{{ $t('ui.upgrades') }}</h5>
             </div>
             <p>
-              <b>Unique Drinks:</b>
+              <b>{{ $t('ui.uniqueDrinks') }}</b>
               {{$store.getters['bartending/drinkTableCount']}}/{{$store.getters['bartending/drinkTableMax']}}
             </p>
             <p>
-              <b>Bonus:</b>
+              <b>{{ $t('ui.bonus') }}</b>
               {{(100*$store.getters["bartending/drinkTableBonus"]).toFixed()}}%
             </p>
           </div>

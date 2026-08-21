@@ -6,8 +6,8 @@ import '@/assets/DiscordActivity.css';
 
 import store from "@/state/store.js";
 import i18n, { setLocale, detectLocale } from "@/i18n";
-import { initDiscordActivity, startDebugSession, discordState } from "@/discord/activity";
-import { hydrateFromCloud, startCloudAutosave } from "@/cloud/save";
+import { initDiscordActivity, startDebugSession, discordState, isDiscordActivity } from "@/discord/activity";
+import { hydrateFromCloud, startCloudAutosave } from "@/state/cloudSave";
 import { isDebugRequested, persistDebugFlag } from "@/debug/mode";
 
 import { BPopover } from 'bootstrap-vue'
@@ -54,19 +54,35 @@ function applyLocale() {
 	store.commit("settings/setLocale", detected);
 }
 
-async function boot() {
-	await initDiscordActivity();
-
-	let serverDebug = false;
+async function loadConfig() {
 	try {
 		const cfg = await fetch("/api/config").then(function (r) { return r.json(); });
-		serverDebug = !!(cfg && cfg.debug);
+		return cfg || {};
 	} catch (err) {
-		// local serve without API
+		return {};
+	}
+}
+
+async function boot() {
+	const cfg = await loadConfig();
+	const localPlayer = cfg.localPlayer === true;
+	discordState.localPlayer = localPlayer;
+
+	const inDiscord = isDiscordActivity();
+	if (!localPlayer && !inDiscord) {
+		applyLocale();
+		new Vue({
+			store,
+			i18n,
+			render: h => h(App),
+		}).$mount('#app');
+		return;
 	}
 
-	const debug = isDebugRequested() || serverDebug;
-	if (debug) {
+	await initDiscordActivity();
+
+	const debugAllowed = localPlayer && (cfg.debug === true || isDebugRequested());
+	if (debugAllowed) {
 		persistDebugFlag(true);
 		discordState.debug = true;
 		store.commit("cheats/enableCheats");
@@ -77,10 +93,16 @@ async function boot() {
 				console.warn("[debug] session failed", err);
 			}
 		}
+	} else {
+		persistDebugFlag(false);
+		discordState.debug = false;
 	}
 
 	applyLocale();
 	await hydrateFromCloud(store);
+	if (!localPlayer) {
+		store.commit("cheats/disableCheats");
+	}
 
 	new Vue({
 		store,

@@ -40,27 +40,27 @@
             <div class="my-3">
               <img class="mx--0" :src="require('@/assets/art/misc/melvor.svg')" alt />
               <b class="mr-2">Malcs (aka MrFrux):</b>
-              <span>Creator of Melvor Idle, this game's original inspiration</span>
+              <span>{{ $t('about.melvor') }}</span>
             </div>
             <div class="my-3">
               <img class="mx--0" :src="require('@/assets/art/misc/clown.png')" alt />
               <b class="mr-2">The Entire Space Station 13 Community:</b>
-              <span>For the creation of all the open source art used in the project</span>
+              <span>{{ $t('about.ss13') }}</span>
             </div>
             <div class="my-3">
               <img class="mx--0" :src="require('@/assets/art/misc/claire.png')" alt />
               <b class="mr-2">Claire "Cemci" Marvinney:</b>
-              <span>For the lovingly handpainted background image</span>
+              <span>{{ $t('about.claire') }}</span>
             </div>
             <div class="my-3">
               <img class="mx--0" :src="require('@/assets/art/combat/enemies/bee_anim.gif')" alt />
               <b class="mr-2">bobbahbrown:</b>
-              <span>For his help organizing /tg/station data</span>
+              <span>{{ $t('about.bobbah') }}</span>
             </div>
             <div class="my-3">
               <img class="mx--0" :src="require('@/assets/art/combat/enemies/bald_visitor.png')" alt />
               <b class="mr-2">"Jerry Derpington":</b>
-              <span>First Playtester</span>
+              <span>{{ $t('about.firstTester') }}</span>
             </div>
             <div class="my-3">
               <img class="mx--0" :src="require('@/assets/art/misc/clark.png')" alt />
@@ -71,7 +71,7 @@
               <b class="mr-2">Armhulen,</b> and
               <img class="mx--0" :src="require('@/assets/art/misc/berry.png')" alt />
               <b class="mr-2">Sunberry:</b>
-              <span>Second Round Playtesters</span>
+              <span>{{ $t('about.secondTesters') }}</span>
             </div>
           </div>
         </div>

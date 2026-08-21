@@ -154,7 +154,7 @@
           <div class="content-block">
             <div class="d-flex flex-row align-items-center">
               <img :src="require('@/assets/art/tinkering/upgrade1.png')" />
-              <h5 class="mb-1">Upgrades</h5>
+              <h5 class="mb-1">{{ $t('ui.upgrades') }}</h5>
             </div>
             <p>
               <b>Streak:</b>

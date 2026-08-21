@@ -2,58 +2,58 @@
   <div class="d-flex flex-column align-items-center">
     <div class="stats-panel d-flex flex-row flex-wrap justify-content-center">
       <stat-panel-item
-        name="Max Health"
-        description="Increases total health pool"
+        :name="$t('combat.maxHealth')"
+        :description="$t('combat.maxHealthDesc')"
         :icon="require('@/assets/art/combat/health.gif')"
         :value="fixedStats.maxHealth"
       />
       <stat-panel-item
-        name="Regen"
-        description="How much health is restored each second"
+        :name="$t('combat.regen')"
+        :description="$t('combat.regenDesc')"
         :icon="require('@/assets/art/combat/regen.gif')"
         :value="fixedStats.regen"
       />
       <stat-panel-item
-        name="Evasion"
-        description="Increases dodge chance"
+        :name="$t('jobs.evasion')"
+        :description="$t('combat.evasionDesc')"
         :icon="require('@/assets/art/combat/black_shoes.png')"
         :value="fixedStats.evasion"
       />
       <stat-panel-item
-        name="Command"
-        description="Reduces companion flee chance"
+        :name="$t('jobs.command')"
+        :description="$t('combat.commandDesc')"
         :icon="require('@/assets/art/combat/command.png')"
         :value="fixedStats.command"
       />
       <stat-panel-item
-        name="Brute Protection"
-        description="Reduces damage taken from brute attacks"
+        :name="$t('combat.bruteProtection')"
+        :description="$t('combat.bruteProtectionDesc')"
         :icon="require('@/assets/art/combat/armor-brute.png')"
         :value="fixedStats.bruteProtection"
         :showPercent="true"
       />
       <stat-panel-item
-        name="Burn Protection"
-        description="Reduces damage taken from burn attacks"
+        :name="$t('combat.burnProtection')"
+        :description="$t('combat.burnProtectionDesc')"
         :icon="require('@/assets/art/combat/armor-burn.png')"
         :value="fixedStats.burnProtection"
         :showPercent="true"
       />
       <stat-panel-item
-        name="Precision"
-        description="Increases chance to hit"
+        :name="$t('jobs.precision')"
+        :description="$t('combat.precisionDesc')"
         :icon="require('@/assets/art/combat/precision.png')"
         :value="fixedStats.precision"
       />
       <stat-panel-item
-        name="Power"
-        description="Increases damage dealt"
+        :name="$t('combat.power')"
+        :description="$t('combat.powerDesc')"
         :icon="require('@/assets/art/combat/skull.png')"
         :value="fixedStats.power"
       />
       <stat-panel-item
-        name="Luck"
-        description="Increases your minimum hit to a percent of your max hit"
+        :name="$t('combat.luck')"
+        :description="$t('combat.luckDesc')"
         :icon="require('@/assets/art/combat/luck.png')"
         :value="fixedStats.luck"
         :showPercent="true"
@@ -63,7 +63,7 @@
         :id="id+'-damage-type'"
         class="attack-type stat-detail d-flex flex-row align-items-center"
       >
-        <span class="mr-1">Type:</span>
+        <span class="mr-1">{{ $t('combat.type') }}</span>
         <img class="attack-type-image mr-1" :src="damageTypeImage" />
       </div>
     </div>
@@ -76,8 +76,8 @@
       :customClass="`${$store.getters['settings/darkModeClass']} no-pointer-events`"
     >
       <div class="d-flex flex-column align-items-center">
-        <h6>Damage Type: {{stats.damageType.toUpperCase()}}</h6>
-        <span>Damage dealt will be inflicted as {{stats.damageType}} damage</span>
+        <h6>{{ $t('combat.damageType', { type: stats.damageType.toUpperCase() }) }}</h6>
+        <span>{{ $t('combat.damageTypeDesc', { type: stats.damageType }) }}</span>
       </div>
     </b-popover>
   </div>

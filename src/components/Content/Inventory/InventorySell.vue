@@ -4,7 +4,7 @@
     class="btn btn-outline-secondary btn-sm d-flex align-items-center justify-content-between w-100"
     @click="sellItem({'itemId': itemId, 'count': count})"
   >
-    <span>Sell x{{count | cleanNum}}</span>
+    <span>{{ $t('inventory.sell') }} x{{count | cleanNum}}</span>
     <div class="mr-3"></div>
     <inventory-price-display :price="totalSellPrice" />
   </button>

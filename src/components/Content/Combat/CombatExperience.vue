@@ -6,16 +6,16 @@
       @click="expanded = !expanded"
     >
       <img :src="require('@/assets/art/misc/eyes.png')" class="mr-2" />
-      <span>Toggle Skill Progress</span>
+      <span>{{ $t('combat.toggleSkill') }}</span>
     </div>
     <div v-if="expanded" class="content-block content-block-bottom">
       <table class="table table-sm pt-2">
         <thead>
           <tr>
             <th></th>
-            <th>LEVEL</th>
-            <th>XP</th>
-            <th class="d-none d-md-table-cell">PROGRESS</th>
+            <th>{{ $t('combat.level') }}</th>
+            <th>{{ $t('combat.xp') }}</th>
+            <th class="d-none d-md-table-cell">{{ $t('combat.progress') }}</th>
           </tr>
         </thead>
         <tbody>

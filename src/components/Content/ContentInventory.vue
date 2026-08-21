@@ -46,13 +46,13 @@
         <div class="col-12">
           <div class="content-block d-flex flex-row justify-content-around">
             <div class="d-flex flex-row align-items-center">
-              <span class="mr-1">Space Used:</span>
+              <span class="mr-1">{{ $t('inventory.spaceUsed') }}</span>
               <span
                 :class="fakeItemCount ? 'primary-bubble' : 'danger-bubble' "
               >{{bankItemIds.length}}/{{bankSlots}}</span>
             </div>
             <div class="d-flex flex-row align-items-center">
-              <span class="mr-1">Bank Value:</span>
+              <span class="mr-1">{{ $t('inventory.bankValue') }}</span>
               <span class="primary-bubble">{{ bankValue | cleanNum}}</span>
             </div>
           </div>
@@ -60,7 +60,7 @@
       </div>
       <div class="row mt-2">
         <div class="col-12">
-          <button class="btn btn-primary" @click="quickSort">Sort Bank</button>
+          <button class="btn btn-primary" @click="quickSort">{{ $t('inventory.sortBank') }}</button>
         </div>
         <div class="col-12 items d-flex flex-row flex-wrap">
           <div

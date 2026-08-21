@@ -24,7 +24,8 @@ npm start
 npm run serve
 ```
 
-Режим отладки: `DEBUG=1` в `.env` или откройте игру с `?debug=1`.
+Локальный браузер: `LOCAL_PLAYER=1` в `.env`. Если `LOCAL_PLAYER=0`, игра открывается только как Discord Activity, а `DEBUG` включить нельзя.
+Режим отладки: `LOCAL_PLAYER=1` и `DEBUG=1` в `.env` (или `?debug=1` при включённом `LOCAL_PLAYER`).
 
 ## nginx
 

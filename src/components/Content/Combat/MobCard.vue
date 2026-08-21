@@ -17,28 +17,28 @@
     <progress-bar
       class="mt-2 black-background"
       :progress="healthPercent"
-      :text="health != 0 ? `${Math.ceil(health)}/${stats.maxHealth}` : 'Dead'"
+      :text="health != 0 ? `${Math.ceil(health)}/${stats.maxHealth}` : $t('combat.dead')"
       :customClass="'bg-danger'"
     />
     <progress-bar
       v-if="!targetEnemy || !moveProgress"
       class="mt-1 black-background"
       :progress="swingProgress"
-      :text="`Attack Speed: ${stats.attackSpeed.toFixed(1)}s`"
+      :text="$t('combat.attackSpeed', { time: stats.attackSpeed.toFixed(1) })"
     />
     <progress-bar
       v-if="!targetEnemy || (moveProgress && mobType == 'player')"
       class="mt-1 black-background"
       :progress="moveProgress"
       :customClass="'bg-success'"
-      :text="`Move Speed: ${Math.max(0.1, moveTime).toFixed(1)}s`"
+      :text="$t('combat.moveSpeed', { time: Math.max(0.1, moveTime).toFixed(1) })"
     />
 
     <div v-if="moveProgress && mobType == 'enemy'" class="fake-bar mt-2"></div>
 		<div class="w-100 mt-2">
       <div class="stat" :id="`${mobType}-stat-max-hit`">
         <img :src="require('@/assets/art/combat/skull.png')" />
-        <span class="stat-desc">Damage:</span>
+        <span class="stat-desc">{{ $t('combat.damage') }}</span>
         <span>{{Math.round(minHit)}} - {{Math.round(maxHit)}}</span>
         <img class="ml-1 damage-type" :src="damageTypeImage" />
       </div>
@@ -47,7 +47,7 @@
     <div v-if="targetEnemy" class="w-100">
       <div class="stat" :id="`${mobType}-stat-hit-chance`">
         <img :src="require('@/assets/art/combat/precision.png')" />
-        <span class="stat-desc">Hit Chance:</span>
+        <span class="stat-desc">{{ $t('combat.hitChance') }}</span>
         <span>{{+(hitChance*100).toFixed(1)}}%</span>
       </div>
       <stat-explain-hit-chance :target="`${mobType}-stat-hit-chance`" :mobType="mobType" />
@@ -56,7 +56,7 @@
     <div v-if="mobType == 'player' && companion" class="w-100">
       <div class="stat" :id="`${mobType}-stat-flee-chance`">
         <img :src="require('@/assets/art/combat/command.png')" />
-        <span class="stat-desc">Flee Chance:</span>
+        <span class="stat-desc">{{ $t('combat.fleeChance') }}</span>
         <span>{{+(fleeChance*100).toFixed(1)}}%</span>
       </div>
       <stat-explain-flee-chance :target="`${mobType}-stat-flee-chance`" :mobType="mobType" />
@@ -66,7 +66,7 @@
 
     <div v-if="isValidhuntingTarget" class="mt-1 d-flex flex-row align-items-center">
       <img :src="validhuntingIcon" />
-      <span class="mr-1 remaining-kills-desc">Remaining Kills:</span>
+      <span class="mr-1 remaining-kills-desc">{{ $t('combat.remainingKills') }}</span>
       <span>{{validhuntingCount}}</span>
     </div>
   </div>
@@ -119,9 +119,9 @@ export default {
     },
     name() {
       if (this.mobType == "player") {
-        return "You";
+        return this.$t("combat.you");
       } else if (this.mobType == "enemy") {
-        return this.enemy.name;
+        return this.$enemyName(this.targetEnemy, this.enemy && this.enemy.name);
       }
       return null;
     },

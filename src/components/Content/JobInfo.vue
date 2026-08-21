@@ -27,12 +27,12 @@
                 class="option-icon"
                 :class="option.iconClass"
               />
-              <span>{{option.name}}</span>
+              <span>{{$infoOption(option.name)}}</span>
             </button>
           </div>
 
           <div class="d-flex flex-column align-items-end w-100">
-            <span class="dismiss" @click="dismiss">DISMISS</span>
+            <span class="dismiss" @click="dismiss">{{ $t('info.dismiss') }}</span>
           </div>
         </div>
       </div>

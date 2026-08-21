@@ -10,12 +10,12 @@
       />
       <b-popover :target="enemy.name+'TalkTag'" triggers="hover" placement="top" delay="0" :customClass="$store.getters['settings/darkModeClass']">
         <div v-if="enemy.desc" class="focus-text d-flex flex-column align-items-center">
-          <p class="text-center"><b>{{enemy.name}}</b> {{enemy.verb ? enemy.verb : "says"}}, "{{enemy.desc}}"</p>
+          <p class="text-center"><b>{{$enemyName(enemyId, enemy.name)}}</b> {{enemy.verb ? enemy.verb : $t('combat.says')}}, "{{enemy.desc}}"</p>
         </div>
       </b-popover>
       <div class="d-flex flex-column">
-        <span v-if="uncompleted" class="name"><u>{{enemy.name}}</u></span>
-        <span v-else class="name">{{enemy.name}}</span>
+        <span v-if="uncompleted" class="name"><u>{{$enemyName(enemyId, enemy.name)}}</u></span>
+        <span v-else class="name">{{$enemyName(enemyId, enemy.name)}}</span>
         <div class="robustness">
           <robustness-badge
             class="mt-1"
@@ -28,11 +28,11 @@
     </div>
     <div v-if="showValidhunting && validhuntingCount" class="validhunting-info">
       <div>
-        <span class="mr-1 validhunting-desc">Kills Remaining:</span>
+        <span class="mr-1 validhunting-desc">{{ $t('combat.killsRemaining') }}</span>
         <span>{{validhuntingCount}}</span>
       </div>
       <div>
-        <span class="mr-1 validhunting-desc">Reward:</span>
+        <span class="mr-1 validhunting-desc">{{ $t('combat.reward') }}</span>
         <span>{{validhuntingXP | cleanNum}}</span>
         <img :src="validhuntingIcon" />
         <span>XP</span>
@@ -42,7 +42,7 @@
       <validhunting-complete-button />
     </div>
     <div class="d-flex flex-column mr-2">
-      <button type="button" :id="id" class="btn btn-primary btn-sm w-100">View Loot</button>
+      <button type="button" :id="id" class="btn btn-primary btn-sm w-100">{{ $t('combat.viewLoot') }}</button>
       <b-popover
         :target="id"
         triggers="click blur"
@@ -57,7 +57,7 @@
         type="button"
         class="btn btn-danger btn-sm w-100 mt-1"
         @click="fight"
-      >Fight!</button>
+      >{{ $t('combat.fight') }}</button>
     </div>
   </div>
 </template>

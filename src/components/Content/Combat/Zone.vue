@@ -8,8 +8,8 @@
       <div class="d-flex flex-column flex-md-row align-items-center align-items-md-top">
         <img :src="zone.icon" class="mr-2" alt />
         <div class="d-flex flex-column align-items-left">
-          <span class="zone-title mr">{{zone.name}}</span>
-          <span class="zone-difficulty">Robustness Range:</span>
+          <span class="zone-title mr">{{$zoneName(zone)}}</span>
+          <span class="zone-difficulty">{{ $t('combat.robustnessRange') }}</span>
           <div class="zone-difficulty mt-1">
             <span :class="[robustnessMinCssClass]">{{robustnessMin}}</span>
             <span class="mx-1">-</span>

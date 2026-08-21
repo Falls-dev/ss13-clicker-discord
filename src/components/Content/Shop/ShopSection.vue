@@ -6,7 +6,7 @@
       @click="expanded = !expanded"
     >
       <img :src="require('@/assets/art/misc/eyes.png')" class="mr-2" />
-      <span>{{section.name}}</span>
+      <span>{{ section.id && $te('shop.section.' + section.id) ? $t('shop.section.' + section.id) : section.name }}</span>
     </div>
     <div v-if="expanded" class="content-block content-block-bottom">
       <div class="purchases">

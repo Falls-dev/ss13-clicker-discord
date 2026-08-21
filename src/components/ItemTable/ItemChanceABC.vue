@@ -9,7 +9,7 @@
     <item-popover :itemId="itemId" :target="id" placement="right" />
     <span v-if="simplified">x</span>
     <span>{{countText}}</span>
-    <span v-if="!simplified">&nbsp;{{item.name}}</span>
+    <span v-if="!simplified">&nbsp;{{$itemName(itemId, item.name)}}</span>
     <span v-if="simplified" class="ml-1">({{bankCount | aggressive}})</span>
   </div>
 </template>

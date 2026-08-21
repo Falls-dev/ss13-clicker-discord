@@ -8,26 +8,26 @@
     <item-popover v-if="!popoversDisabled" :target="id" :itemId="itemId" />
     <b-popover v-if="!popoversDisabled" ref="popover" :target="id" triggers="click blur" placement="bottom" delay="30" :customClass="$store.getters['settings/darkModeClass']">
       <div class="popup d-flex flex-column align-items-center">
-        <h6 class="title">{{item.name}}</h6>
+        <h6 class="title">{{$itemName(itemId, item.name)}}</h6>
         <button
           v-if="canEquip"
           class="mt-1 btn btn-primary btn-sm"
           @click="$store.dispatch('inventory/equip', itemId)"
-        >Equip {{item.healAmount ? "food" : item.equipmentSlot}}</button>
-        <span v-if="isEquipped" class="description">Already Equipped</span>
+        >{{ item.healAmount ? $t('inventory.equipFood') : $t('inventory.equip', { slot: $equipSlot(item.equipmentSlot) }) }}</button>
+        <span v-if="isEquipped" class="description">{{ $t('inventory.alreadyEquipped') }}</span>
 
         <div v-if="item.potionJob" class="mt-1">
           <button
             v-if="canEquipChem"
             class="mt-1 btn btn-primary btn-sm"
             @click="$store.dispatch('potions/set', itemId); $refs.popover.$emit('close');"
-          >Equip BOOST</button>
-          <span v-else-if="jobLocked" class="description">Job Locked</span>
-          <span v-else class="description">Already Equipped</span>
+          >{{ $t('inventory.equipBoost') }}</button>
+          <span v-else-if="jobLocked" class="description">{{ $t('inventory.jobLocked') }}</span>
+          <span v-else class="description">{{ $t('inventory.alreadyEquipped') }}</span>
         </div>
-        <button v-if="canOpen" class="mt-1 btn btn-primary btn-sm" @click="open">Open!</button>
-        <button v-if="canOpen && !bankFull" class="mt-1 btn btn-primary btn-sm" @click="openAll">Open All {{count}}!</button>
-        <button v-if="canOpen" class="mt-1 btn btn-primary btn-sm" @click="viewOdds">View Odds</button>
+        <button v-if="canOpen" class="mt-1 btn btn-primary btn-sm" @click="open">{{ $t('inventory.open') }}</button>
+        <button v-if="canOpen && !bankFull" class="mt-1 btn btn-primary btn-sm" @click="openAll">{{ $t('inventory.openAll', { count: count }) }}</button>
+        <button v-if="canOpen" class="mt-1 btn btn-primary btn-sm" @click="viewOdds">{{ $t('inventory.viewOdds') }}</button>
         <div v-if="item.sellPrice" class="mt-1">
           <inventory-sell :itemId="itemId" :count="1" :totalCount="count" />
           <inventory-sell :itemId="itemId" :count="10" :totalCount="count" />
@@ -46,7 +46,7 @@
             v-if="count != 1 && count != 10 && count != 100 && count != 1000"
           />
         </div>
-        <span v-else class="mt-1">Can't be sold</span>
+        <span v-else class="mt-1">{{ $t('inventory.cantSell') }}</span>
       </div>
     </b-popover>
   </div>

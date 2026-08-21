@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span :id="id" class="robustness" :class="[robustnessClass]">ROBUSTNESS: {{robustness}}</span>
+    <span :id="id" class="robustness" :class="[robustnessClass]">{{ $t('combat.robustness', { value: robustness }) }}</span>
     <b-popover
       :target="id"
       triggers="hover"
@@ -9,7 +9,7 @@
       :customClass="`${$store.getters['settings/darkModeClass']} no-pointer-events`"
     >
       <div class="d-flex flex-column align-items-center">
-        <span class="mb-1 description">Attack Speed: {{getBasedStats.attackSpeed}}</span>
+        <span class="mb-1 description">{{ $t('inventory.attackSpeed', { time: getBasedStats.attackSpeed }) }}</span>
         <stats-panel :stats="getBasedStats" />
       </div>
     </b-popover>

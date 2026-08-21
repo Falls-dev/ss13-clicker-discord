@@ -46,7 +46,7 @@ export default {
       const enemyId = this.$store.getters["combat/targetEnemy"];
       if (enemyId) {
         const enemy = ENEMIES[enemyId];
-        return enemy && enemy.name ? this.$t("pip.fighting", { name: enemy.name }) : this.$t("pip.fighting", { name: enemyId });
+        return enemy && enemy.name ? this.$t("pip.fighting", { name: this.$enemyName(enemyId, enemy.name) }) : this.$t("pip.fighting", { name: enemyId });
       }
       for (let i = 0; i < ALL_JOBS.length; i++) {
         const job = ALL_JOBS[i];

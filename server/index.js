@@ -13,7 +13,9 @@ const HOST = process.env.HOST || "127.0.0.1";
 const CLIENT_ID =
 	process.env.DISCORD_CLIENT_ID || process.env.VUE_APP_DISCORD_CLIENT_ID || "";
 const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || "";
-const DEBUG = String(process.env.DEBUG || "") === "1";
+const LOCAL_PLAYER = String(process.env.LOCAL_PLAYER || "") === "1";
+const DEBUG_REQUESTED = String(process.env.DEBUG || "") === "1";
+const DEBUG = DEBUG_REQUESTED && LOCAL_PLAYER;
 const BEHIND_PROXY = String(process.env.BEHIND_PROXY || "1") !== "0";
 const DIST_PATH = path.join(__dirname, "..", "dist");
 
@@ -84,6 +86,7 @@ function sendConfig(_req, res) {
 	res.json({
 		clientId: CLIENT_ID,
 		activity: true,
+		localPlayer: LOCAL_PLAYER,
 		debug: DEBUG
 	});
 }
@@ -144,7 +147,7 @@ async function exchangeToken(req, res) {
 }
 
 app.get("/api/health", function (_req, res) {
-	res.json({ ok: true, debug: DEBUG, db: db.stats() });
+	res.json({ ok: true, debug: DEBUG, localPlayer: LOCAL_PLAYER, db: db.stats() });
 });
 app.get("/api/config", sendConfig);
 app.get("/.proxy/api/config", sendConfig);
@@ -187,7 +190,9 @@ app.post("/api/save", requireSession, postSave);
 app.post("/.proxy/api/save", requireSession, postSave);
 
 function debugSession(req, res) {
-	if (!DEBUG) return res.status(403).json({ error: "Debug is off" });
+	if (!LOCAL_PLAYER || !DEBUG) {
+		return res.status(403).json({ error: "Debug is disabled" });
+	}
 	const userId = (req.body && req.body.userId) || "debug-local";
 	const session_token = db.createSession({
 		id: String(userId),
@@ -224,7 +229,11 @@ server.listen(PORT, HOST, function () {
 	console.log("[ss13-idle] listening on " + protocol + "://" + HOST + ":" + PORT);
 	console.log("[ss13-idle] public URL: https://spacestation13clicker.ss13.site");
 	console.log("[ss13-idle] sqlite: " + db.DB_PATH);
-	if (DEBUG) console.log("[ss13-idle] DEBUG mode enabled");
+	if (DEBUG) console.log("[ss13-idle] DEBUG mode enabled (LOCAL_PLAYER=1)");
+	else if (DEBUG_REQUESTED && !LOCAL_PLAYER) {
+		console.warn("[ss13-idle] DEBUG ignored because LOCAL_PLAYER is off");
+	}
+	console.log("[ss13-idle] LOCAL_PLAYER=" + (LOCAL_PLAYER ? "1 (browser allowed)" : "0 (Discord only)"));
 	if (!CLIENT_ID || !CLIENT_SECRET) {
 		console.warn("[ss13-idle] Set DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET in .env");
 	}

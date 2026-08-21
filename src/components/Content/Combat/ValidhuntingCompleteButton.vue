@@ -1,8 +1,8 @@
 <template>
   <button class="btn btn-primary d-flex flex-column align-items-center" @click="completeTask">
-    <p>Task complete!</p>
+    <p>{{ $t('toast.taskComplete') }}</p>
     <div>
-      <span class="mr-1 validhunting-desc">Collect</span>
+      <span class="mr-1 validhunting-desc">{{ $t('combat.reward') }}</span>
       <span>+{{validhuntingXP | cleanNum}}</span>
       <img :src="validhuntingIcon" />
       <span>XP</span>

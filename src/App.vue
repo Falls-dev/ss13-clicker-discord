@@ -1,8 +1,9 @@
 <template>
   <div id="app" :class="{'dark-mode' : darkMode, 'discord-pip-mode': isPip}">
-    <debug-panel v-if="debugEnabled" />
-    <discord-pip v-if="isPip" />
-    <template v-else>
+    <discord-gate v-if="showDiscordGate" />
+    <debug-panel v-else-if="debugEnabled" />
+    <discord-pip v-if="!showDiscordGate && isPip" />
+    <template v-if="!showDiscordGate && !isPip">
       <toast-container />
       <div class="mega-container">
         <sidebar />
@@ -23,7 +24,8 @@ import ModalWelcomeBack from "@/components/Modals/ModalWelcomeBack";
 import PanelsContainer from "@/components/Panels/PanelsContainer";
 import DiscordPip from "@/discord/DiscordPip.vue";
 import DebugPanel from "@/debug/DebugPanel.vue";
-import { discordState, LAYOUT_FOCUSED } from "@/discord/activity";
+import DiscordGate from "@/components/DiscordGate.vue";
+import { discordState, LAYOUT_FOCUSED, isDiscordActivity } from "@/discord/activity";
 import { mapGetters, mapMutations } from "vuex";
 export default {
   name: "App",
@@ -33,7 +35,8 @@ export default {
     ContentWrapper,
     PanelsContainer,
     DiscordPip,
-    DebugPanel
+    DebugPanel,
+    DiscordGate
   },
   computed: {
     ...mapGetters(["welcomeMessageSeen"]),
@@ -44,14 +47,17 @@ export default {
       return discordState.active && discordState.layoutMode !== LAYOUT_FOCUSED;
     },
     debugEnabled() {
-      return discordState.debug;
+      return discordState.debug && discordState.localPlayer;
+    },
+    showDiscordGate() {
+      return !discordState.localPlayer && !isDiscordActivity();
     }
   },
   methods: {
     ...mapMutations(["setWelcomeMessageSeen"])
   },
   mounted() {
-    if (this.isPip) return;
+    if (this.showDiscordGate || this.isPip) return;
     if (!this.$store.state.update4Seen) {
       this.$modal.show(ModalUpdate, {}, { height: "auto", width: "360px" });
       this.$store.state.update4Seen = true;

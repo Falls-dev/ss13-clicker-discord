@@ -1,6 +1,6 @@
 <template>
   <div v-if="isBoss && !bossAlive" class="content-block mt-3">
-    <h6>FIGHT ANOTHER BOSS</h6>
+    <h6>{{ $t('combat.fightAnotherBoss') }}</h6>
     <div class="black-background mt-1 px-2 py-1">
       <shop-purchase
         v-for="(shopPurchase, purchaseIndex) in targetZone.purchases"

@@ -19,16 +19,16 @@
     />
 
     <div class="d-flex flex-column w-100">
-      <span class="name">{{name}}</span>
+      <span class="name">{{displayName}}</span>
       <span class="description">{{purchase.description}}</span>
       <div v-if="canOpen">
-        <button class="my-1 btn btn-primary btn-sm" @click.stop="viewOdds">View Odds</button>
+        <button class="my-1 btn btn-primary btn-sm" @click.stop="viewOdds">{{ $t('shop.viewOdds') }}</button>
       </div>
       <div v-if="upgradeChain.length > 1 && upgradeChain.length < 99 && !hideChain">
-        <button class="my-1 btn btn-primary btn-sm" @click.stop="viewChain">View Chain</button>
+        <button class="my-1 btn btn-primary btn-sm" @click.stop="viewChain">{{ $t('shop.viewChain') }}</button>
       </div>
       <div class="requires d-flex flex-row align-items-center flex-wrap">
-        <span class="requires mr-1">Requires:</span>
+        <span class="requires mr-1">{{ $t('shop.requires') }}</span>
         <div
           v-for="(pair, index) in Object.entries(requiredLevels)"
           :key="'level'+index"
@@ -98,6 +98,10 @@ export default {
       if (this.purchase.name) return this.purchase.name;
       if (this.item) return this.item.name;
       return "Missing name";
+    },
+    displayName() {
+      const fallback = this.item ? this.$itemName(this.purchase.item, this.name) : this.name;
+      return this.$upgradeName(this.purchaseId, this.$purchaseName(this.purchaseId, fallback));
     },
     canPurchase() {
       return this.$store.getters["inventory/canPurchase"](this.purchase);

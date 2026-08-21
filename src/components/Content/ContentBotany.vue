@@ -112,7 +112,7 @@
           <div class="content-block">
             <div class="d-flex flex-row align-items-center">
               <img :src="require('@/assets/art/botany/upgrade1.png')" />
-              <h5 class="mb-1">Upgrades</h5>
+              <h5 class="mb-1">{{ $t('ui.upgrades') }}</h5>
             </div>
             <div class="custom-control custom-switch mt-1">
               <input
@@ -121,7 +121,7 @@
                 class="custom-control-input"
                 id="upgradeLeftEnabled"
               />
-              <label class="custom-control-label" for="upgradeLeftEnabled">Upgrade Enabled (Left)</label>
+              <label class="custom-control-label" for="upgradeLeftEnabled">{{ $t('ui.upgradeLeft') }}</label>
             </div>
             <div
               class="custom-control custom-switch mt-1"
@@ -133,7 +133,7 @@
                 class="custom-control-input"
                 id="upgradeRightEnabled"
               />
-              <label class="custom-control-label" for="upgradeRightEnabled">Upgrade Enabled (Right)</label>
+              <label class="custom-control-label" for="upgradeRightEnabled">{{ $t('ui.upgradeRight') }}</label>
             </div>
           </div>
         </div>

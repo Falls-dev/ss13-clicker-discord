@@ -10,7 +10,8 @@ export const discordState = Vue.observable({
 	user: null,
 	sessionToken: "",
 	layoutMode: LAYOUT_FOCUSED,
-	debug: false
+	debug: false,
+	localPlayer: false
 });
 
 let discordSdk = null;

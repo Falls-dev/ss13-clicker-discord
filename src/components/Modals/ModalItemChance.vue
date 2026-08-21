@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column align-items-center m-3 text-center">
-		<h4 class="mb-2">{{item.name}}</h4>
+		<h4 class="mb-2">{{$itemName(itemId, item.name)}}</h4>
     <item-chance :data="item" />
   </div>
 </template>

@@ -36,6 +36,13 @@ const cheats = {
 		enableCheats(state) {
 			state.cheatsEnabled = true;
 		},
+		disableCheats(state) {
+			state.cheatsEnabled = false;
+			state.showAllActions = false;
+			state.unlockAllJobs = false;
+			state.infiniteChrono = false;
+			state.extraChronoOptions = false;
+		},
 		setInfiniteChrono(state, val) {
 			state.infiniteChrono = val;
 		},

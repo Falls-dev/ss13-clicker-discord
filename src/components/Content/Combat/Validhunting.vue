@@ -1,13 +1,13 @@
 <template>
   <div class="content-block d-flex flex-column align-items-center">
-    <h5>Validhunting Target</h5>
-    <p v-if="maxRerolls">Rerolls remaining: {{rerolls}}/{{maxRerolls}}</p>
+    <h5>{{ $t('combat.validhuntingTarget') }}</h5>
+    <p v-if="maxRerolls">{{ $t('combat.rerollsRemaining', { current: rerolls, max: maxRerolls }) }}</p>
     <div v-if="rerolls" class="d-flex flex-column mr-2" style="padding-top:10px"><button
         :id="reroll+reroll.id"
         type="button"
         class="btn btn-primary btn-sm w-100"
         @click="reroll"
-    >Reroll</button></div>
+    >{{ $t('combat.reroll') }}</button></div>
     <div class="enemies w-100 mt-2">
       <zone-enemy
         :enemyId="targetEnemyId"

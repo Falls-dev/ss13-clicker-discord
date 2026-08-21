@@ -4,30 +4,37 @@ import {HEAD_SEASON_ONE, HEAD_SEASON_TWO} from '@/data/items/slotHead'
 
 export const SECTIONS = [
 	{
+		id: "inventoryExpansion",
 		name: "Inventory Expansion",
 		purchases: Object.keys(INVENTORY_UPGRADES)
 	},
 	{
+		id: "megaSeed",
 		name: "MegaSeed Servitor",
 		purchases: ['seed10', 'seed100', 'seed500', 'seed2000', 'seed5000']
 	},
 	{
+		id: "jobUnlocks",
 		name: "Job Unlocks",
 		purchases: ["unlockFabrication", "unlockTinkering", "unlockChemistry", "unlockResearch", "unlockCooking", "unlockBartending", "unlockXenobiology", "unlockShitposting", "unlockCargonia","unlockTraitor", "unlockCult", "unlockLing"]
 	},
 	{
+		id: "jobUpgrades",
 		name: "Job Upgrades",
 		purchases: Object.keys(JOB_UPGRADES)
 	},
 	{
+		id: "combatUpgrades",
 		name: "Combat Upgrades",
 		purchases: Object.keys(COMBAT_UPGRADES)
 	},
 	{
+		id: "gamble",
 		name: "Gamble-O-Tron",
 		purchases: ["supplyCrate", "knifeCrate", "hatCrate", "hatCrate2", "revCrate", "secCrate", "lavaCrate", "syndieCrate",  "cultCrate", "ertCrate", "wizCrate"]
 	},
 	{
+		id: "clothes",
 		name: "Clothes Vendo-Matic",
 		purchases: ["capeMining", "capeEngineering", "capeFabrication", "capeResearch", "capeGraytiding", "capeTinkering", "capeBotany", "capeCooking", "capeBartending", "capeXenobiology", "capeChemistry","capeValid", "capeShitposting"]
 	}
