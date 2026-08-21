@@ -41,7 +41,25 @@ To launch a hot-reloading copy of your repo, type the following: (You will also 
 npm run serve
 ```
 
+### Discord Activity
 
+The game can run as a Discord Activity at `https://spacestation13clicker.ss13.site:4443`.
+
+1. Copy `example.env` to `.env` and fill in your Discord application IDs/secrets.
+2. Put TLS files in `certs/fullchain.pem` and `certs/privkey.pem` (Discord requires HTTPS).
+3. Build and start the activity server:
+
+```
+npm run discord
+```
+
+In the Discord Developer Portal:
+
+- Enable Activities
+- OAuth2 Redirect: `https://127.0.0.1`
+- URL Mapping: `/` → `spacestation13clicker.ss13.site:4443`
+
+```
 ### Deploy To Github
 
 First, edit `deployGit.sh` as well as `vue.config.js` with your repo address (You will only need to edit `vue.config.js` if you modify the name of the repo, such as cloning vs forking.)
