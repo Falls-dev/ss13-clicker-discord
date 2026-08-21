@@ -43,23 +43,29 @@ npm run serve
 
 ### Discord Activity
 
-The game can run as a Discord Activity at `https://spacestation13clicker.ss13.site:4443`.
+The game runs as a Discord Activity at `https://spacestation13clicker.ss13.site`.
 
-1. Copy `example.env` to `.env` and fill in your Discord application IDs/secrets.
-2. Put TLS files in `certs/fullchain.pem` and `certs/privkey.pem` (Discord requires HTTPS).
-3. Build and start the activity server:
+nginx terminates HTTPS and reverse-proxies to `http://127.0.0.1:4443`. Config: `deploy/nginx-spacestation13clicker.conf`.
 
 ```
-npm run discord
+npm run build
+npm start
 ```
 
 In the Discord Developer Portal:
 
 - Enable Activities
 - OAuth2 Redirect: `https://127.0.0.1`
-- URL Mapping: `/` → `spacestation13clicker.ss13.site:4443`
+- URL Mapping: `/` → `spacestation13clicker.ss13.site`
 
-```
+Saves are stored in local SQLite (`data/saves.sqlite`) keyed by Discord user ID, so the same account syncs between Discord desktop and Discord mobile.
+
+Language: EN/RU toggle in the sidebar and Settings.
+
+Debug overlay: set `DEBUG=1` in `.env` or open with `?debug=1`.
+
+Russian setup notes: `README_RU.md`.
+
 ### Deploy To Github
 
 First, edit `deployGit.sh` as well as `vue.config.js` with your repo address (You will only need to edit `vue.config.js` if you modify the name of the repo, such as cloning vs forking.)
