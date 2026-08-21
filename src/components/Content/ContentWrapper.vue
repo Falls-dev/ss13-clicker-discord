@@ -29,9 +29,13 @@ import ContentCombat from "./ContentCombat";
 import ContentSettings from "./ContentSettings";
 import ContentChronosphere from "./ContentChronosphere";
 import ContentCompletion from "./ContentCompletion";
-import ContentItemSpawner from "./ContentItemSpawner";
 import ContentAbout from "@/components/Content/ContentAbout";
 import ContentCustomization from "@/components/Content/ContentCustomization";
+
+const debugPages = {};
+if (process.env.NODE_ENV !== "production") {
+	debugPages.ContentItemSpawner = require("./ContentItemSpawner").default;
+}
 
 export default {
   name: "ContentWrapper",
@@ -58,9 +62,9 @@ export default {
     ContentSettings,
     ContentChronosphere,
     ContentCompletion,
-    ContentItemSpawner,
     ContentAbout,
-    ContentCustomization
+    ContentCustomization,
+    ...debugPages
   },
   computed: {
     ...mapGetters(["visibleSidebarItem"]),

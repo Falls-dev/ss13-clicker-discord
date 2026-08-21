@@ -1,4 +1,4 @@
-import Vue from 'vue'
+const IS_PROD = process.env.NODE_ENV === "production";
 
 const cheats = {
 	namespaced: true,
@@ -11,29 +11,32 @@ const cheats = {
 	},
 	getters: {
 		showAllActions(state) {
-			return state.showAllActions;
+			return IS_PROD ? false : state.showAllActions;
 		},
 		unlockAllJobs(state) {
-			return state.unlockAllJobs;
+			return IS_PROD ? false : state.unlockAllJobs;
 		},
 		cheatsEnabled(state) {
-			return state.cheatsEnabled;
+			return IS_PROD ? false : state.cheatsEnabled;
 		},
 		infiniteChrono(state) {
-			return state.infiniteChrono;
+			return IS_PROD ? false : state.infiniteChrono;
 		},
 		extraChronoOptions(state) {
-			return state.extraChronoOptions;
+			return IS_PROD ? false : state.extraChronoOptions;
 		}
 	},
 	mutations: {
 		setShowAllActions(state, val) {
+			if (IS_PROD) return;
 			state.showAllActions = val;
 		},
 		setUnlockAllJobs(state, val) {
+			if (IS_PROD) return;
 			state.unlockAllJobs = val;
 		},
 		enableCheats(state) {
+			if (IS_PROD) return;
 			state.cheatsEnabled = true;
 		},
 		disableCheats(state) {
@@ -44,9 +47,11 @@ const cheats = {
 			state.extraChronoOptions = false;
 		},
 		setInfiniteChrono(state, val) {
+			if (IS_PROD) return;
 			state.infiniteChrono = val;
 		},
 		setExtraChronoOptions(state, val) {
+			if (IS_PROD) return;
 			state.extraChronoOptions = val;
 		}
 	}

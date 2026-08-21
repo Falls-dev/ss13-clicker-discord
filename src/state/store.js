@@ -185,6 +185,7 @@ const store = new Vuex.Store({
 	},
 	mutations: {
 		setVisibleSidebarItem(state, id) {
+			if (process.env.NODE_ENV === "production" && id === "item-spawner") return;
 			state.visibleSidebarItem = id;
 		},
 		_resetState(state, softReset) {

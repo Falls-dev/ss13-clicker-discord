@@ -38,6 +38,7 @@ const version = JSON.parse(packageJson).version || 0;
 
 module.exports = {
 	publicPath: process.env.FULL_PATH ? "/space-station-13-idle/" : "/",
+	productionSourceMap: false,
 
 	devServer: {
 		port: Number(process.env.DEV_PORT || 8080),
@@ -52,9 +53,17 @@ module.exports = {
 			new webpack.DefinePlugin({
 				"process.env.PACKAGE_VERSION": JSON.stringify(version)
 			})
-		],
+		].concat(
+			process.env.NODE_ENV === "production"
+				? [
+						new webpack.IgnorePlugin(/@\/debug\//),
+						new webpack.IgnorePlugin(/ContentItemSpawner/)
+				  ]
+				: []
+		),
 		performance: {
 			hints: false
-		}
+		},
+		devtool: process.env.NODE_ENV === "production" ? false : "eval-source-map"
 	}
 };

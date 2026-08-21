@@ -6,9 +6,8 @@ import '@/assets/DiscordActivity.css';
 
 import store from "@/state/store.js";
 import i18n, { setLocale, detectLocale } from "@/i18n";
-import { initDiscordActivity, startDebugSession, discordState, isDiscordActivity } from "@/discord/activity";
+import { initDiscordActivity, discordState, isDiscordActivity } from "@/discord/activity";
 import { hydrateFromCloud, startCloudAutosave } from "@/state/cloudSave";
-import { isDebugRequested, persistDebugFlag } from "@/debug/mode";
 
 import { BPopover } from 'bootstrap-vue'
 Vue.component('b-popover', BPopover)
@@ -63,6 +62,24 @@ async function loadConfig() {
 	}
 }
 
+async function bootDebug(cfg) {
+	if (process.env.NODE_ENV === "production") return;
+	const localPlayer = cfg.localPlayer === true;
+	if (!localPlayer || cfg.debug !== true) return;
+	const mode = require("@/debug/mode");
+	const session = require("@/debug/session");
+	mode.persistDebugFlag(true);
+	discordState.debug = true;
+	store.commit("cheats/enableCheats");
+	if (!discordState.sessionToken) {
+		try {
+			await session.startDebugSession("debug-local");
+		} catch (err) {
+			console.warn("[debug] session failed", err);
+		}
+	}
+}
+
 async function boot() {
 	const cfg = await loadConfig();
 	const localPlayer = cfg.localPlayer === true;
@@ -80,27 +97,16 @@ async function boot() {
 	}
 
 	await initDiscordActivity();
+	await bootDebug(cfg);
 
-	const debugAllowed = localPlayer && (cfg.debug === true || isDebugRequested());
-	if (debugAllowed) {
-		persistDebugFlag(true);
-		discordState.debug = true;
-		store.commit("cheats/enableCheats");
-		if (!discordState.sessionToken) {
-			try {
-				await startDebugSession("debug-local");
-			} catch (err) {
-				console.warn("[debug] session failed", err);
-			}
-		}
-	} else {
-		persistDebugFlag(false);
+	if (process.env.NODE_ENV === "production") {
 		discordState.debug = false;
+		store.commit("cheats/disableCheats");
 	}
 
 	applyLocale();
 	await hydrateFromCloud(store);
-	if (!localPlayer) {
+	if (process.env.NODE_ENV === "production" || !localPlayer) {
 		store.commit("cheats/disableCheats");
 	}
 

@@ -1,7 +1,15 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
-const { DatabaseSync } = require("node:sqlite");
+
+let DatabaseSync;
+try {
+	DatabaseSync = require("node:sqlite").DatabaseSync;
+} catch (err) {
+	console.error("[ss13-idle] SQLite requires Node.js 22.5+ (built-in node:sqlite).");
+	console.error("[ss13-idle] This host is " + process.version + ". Install Node 22 LTS and retry.");
+	process.exit(1);
+}
 
 const DATA_DIR = process.env.DATA_DIR
 	? path.resolve(process.env.DATA_DIR)
@@ -107,8 +115,7 @@ function stats() {
 	const sessions = db.prepare(`SELECT COUNT(*) AS n FROM sessions`).get();
 	return {
 		saves: Number(saves && saves.n) || 0,
-		sessions: Number(sessions && sessions.n) || 0,
-		path: DB_PATH
+		sessions: Number(sessions && sessions.n) || 0
 	};
 }
 

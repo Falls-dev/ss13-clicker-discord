@@ -65,14 +65,59 @@ function requireSession(req, res, next) {
 	next();
 }
 
+function isAllowedOrigin(origin) {
+	if (!origin) return false;
+	try {
+		const host = new URL(origin).hostname;
+		if (host === "spacestation13clicker.ss13.site") return true;
+		if (/\.discordsays\.com$/i.test(host)) return true;
+		if (/\.discordactivities\.com$/i.test(host)) return true;
+		if (host === "discord.com" || /\.discord\.com$/i.test(host)) return true;
+		if (LOCAL_PLAYER && (host === "localhost" || host === "127.0.0.1")) return true;
+	} catch (err) {
+		return false;
+	}
+	return false;
+}
+
+const CLEAN_CHEATS = {
+	showAllActions: false,
+	unlockAllJobs: false,
+	cheatsEnabled: false,
+	infiniteChrono: false,
+	extraChronoOptions: false
+};
+
+function sanitizeSave(save) {
+	if (!save || typeof save !== "object" || Array.isArray(save)) return null;
+	let cloned;
+	try {
+		cloned = JSON.parse(JSON.stringify(save));
+	} catch (err) {
+		return null;
+	}
+	delete cloned.__proto__;
+	delete cloned.constructor;
+	if (!DEBUG) {
+		cloned.cheats = Object.assign({}, CLEAN_CHEATS);
+	}
+	return cloned;
+}
+
 const app = express();
 app.disable("x-powered-by");
 app.use(express.json({ limit: "8mb" }));
 
 app.use(function (req, res, next) {
-	res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+	const origin = req.headers.origin;
+	if (origin && isAllowedOrigin(origin)) {
+		res.setHeader("Access-Control-Allow-Origin", origin);
+		res.setHeader("Vary", "Origin");
+	}
 	res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 	res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+	res.setHeader("X-Content-Type-Options", "nosniff");
+	res.setHeader("Referrer-Policy", "no-referrer");
 	res.setHeader(
 		"Content-Security-Policy",
 		"frame-ancestors https://discord.com https://*.discord.com https://*.discordapp.net https://*.discordsays.com"
@@ -83,12 +128,13 @@ app.use(function (req, res, next) {
 });
 
 function sendConfig(_req, res) {
-	res.json({
+	const cfg = {
 		clientId: CLIENT_ID,
 		activity: true,
-		localPlayer: LOCAL_PLAYER,
-		debug: DEBUG
-	});
+		localPlayer: LOCAL_PLAYER
+	};
+	if (DEBUG) cfg.debug = true;
+	res.json(cfg);
 }
 
 async function exchangeToken(req, res) {
@@ -117,8 +163,7 @@ async function exchangeToken(req, res) {
 		const payload = await response.json();
 		if (!response.ok || !payload.access_token) {
 			return res.status(502).json({
-				error: "Discord token exchange failed",
-				details: payload
+				error: "Discord token exchange failed"
 			});
 		}
 
@@ -147,7 +192,7 @@ async function exchangeToken(req, res) {
 }
 
 app.get("/api/health", function (_req, res) {
-	res.json({ ok: true, debug: DEBUG, localPlayer: LOCAL_PLAYER, db: db.stats() });
+	res.json({ ok: true });
 });
 app.get("/api/config", sendConfig);
 app.get("/.proxy/api/config", sendConfig);
@@ -159,16 +204,18 @@ function getSave(req, res) {
 	if (!current) {
 		return res.json({ save: null, updatedAt: 0, revision: 0 });
 	}
+	current.save = sanitizeSave(current.save) || current.save;
 	return res.json(current);
 }
 
 function postSave(req, res) {
-	if (!req.body || typeof req.body.save !== "object") {
+	const save = sanitizeSave(req.body && req.body.save);
+	if (!save) {
 		return res.status(400).json({ error: "Missing save payload" });
 	}
 	const result = db.putSave(
 		req.session.userId,
-		req.body.save,
+		save,
 		req.body.updatedAt
 	);
 	if (result.conflict) {
@@ -189,24 +236,25 @@ app.get("/.proxy/api/save", requireSession, getSave);
 app.post("/api/save", requireSession, postSave);
 app.post("/.proxy/api/save", requireSession, postSave);
 
-function debugSession(req, res) {
+function debugSession(_req, res) {
 	if (!LOCAL_PLAYER || !DEBUG) {
-		return res.status(403).json({ error: "Debug is disabled" });
+		return res.status(404).json({ error: "Not found" });
 	}
-	const userId = (req.body && req.body.userId) || "debug-local";
 	const session_token = db.createSession({
-		id: String(userId),
+		id: "debug-local",
 		username: "debug",
 		locale: "en"
 	});
 	return res.json({
 		session_token,
-		user: { id: String(userId), username: "debug", global_name: "Debug" }
+		user: { id: "debug-local", username: "debug", global_name: "Debug" }
 	});
 }
 
-app.post("/api/debug/session", debugSession);
-app.post("/.proxy/api/debug/session", debugSession);
+if (DEBUG) {
+	app.post("/api/debug/session", debugSession);
+	app.post("/.proxy/api/debug/session", debugSession);
+}
 
 if (!fs.existsSync(path.join(DIST_PATH, "index.html"))) {
 	console.warn("[discord] dist/ is missing. Run `npm run build` before `npm start`.");
