@@ -1,12 +1,15 @@
 <template>
-  <div id="app" :class="{'dark-mode' : darkMode}">
-    <toast-container />
-    <div class="mega-container">
-      <sidebar />
-      <content-wrapper class="content-wrapper" />
-    </div>
-    <panels-container />
-    <modals-container />
+  <div id="app" :class="{'dark-mode' : darkMode, 'discord-pip-mode': isPip}">
+    <discord-pip v-if="isPip" />
+    <template v-else>
+      <toast-container />
+      <div class="mega-container">
+        <sidebar />
+        <content-wrapper class="content-wrapper" />
+      </div>
+      <panels-container />
+      <modals-container />
+    </template>
   </div>
 </template>
 
@@ -17,6 +20,8 @@ import ContentWrapper from "@/components/Content/ContentWrapper.vue";
 import ModalUpdate from "@/components/Modals/ModalUpdate";
 import ModalWelcomeBack from "@/components/Modals/ModalWelcomeBack";
 import PanelsContainer from "@/components/Panels/PanelsContainer";
+import DiscordPip from "@/discord/DiscordPip.vue";
+import { discordState, LAYOUT_FOCUSED } from "@/discord/activity";
 import { mapGetters, mapMutations } from "vuex";
 export default {
   name: "App",
@@ -24,18 +29,23 @@ export default {
     ToastContainer,
     Sidebar,
     ContentWrapper,
-    PanelsContainer
+    PanelsContainer,
+    DiscordPip
   },
   computed: {
     ...mapGetters(["welcomeMessageSeen"]),
     darkMode() {
       return this.$store.getters["settings/darkMode"];
+    },
+    isPip() {
+      return discordState.active && discordState.layoutMode !== LAYOUT_FOCUSED;
     }
   },
   methods: {
     ...mapMutations(["setWelcomeMessageSeen"])
   },
   mounted() {
+    if (this.isPip) return;
     if (!this.$store.state.update4Seen) {
       this.$modal.show(ModalUpdate, {}, { height: "auto", width: "360px" });
       this.$store.state.update4Seen = true;

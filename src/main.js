@@ -2,8 +2,10 @@ import Vue from 'vue'
 import App from './App.vue'
 import 'bootstrap/dist/css/bootstrap.css';
 import '@/assets/GlobalStyle.css';
+import '@/assets/DiscordActivity.css';
 
 import store from "@/state/store.js";
+import { initDiscordActivity } from "@/discord/activity";
 
 import { BPopover } from 'bootstrap-vue'
 Vue.component('b-popover', BPopover)
@@ -32,12 +34,18 @@ Vue.filter('aggressive', function (value) {
 	return value.toLocaleString();
 })
 
-new Vue({
-	store,
-	render: h => h(App),
-}).$mount('#app')
+async function boot() {
+	await initDiscordActivity();
 
-store.dispatch('chrono/updateOfflineTime');
-store.dispatch('research/startupRoll');
-store.dispatch("cleanup");
-store.dispatch("_resume");
+	new Vue({
+		store,
+		render: h => h(App),
+	}).$mount('#app')
+
+	store.dispatch('chrono/updateOfflineTime');
+	store.dispatch('research/startupRoll');
+	store.dispatch("cleanup");
+	store.dispatch("_resume");
+}
+
+boot();

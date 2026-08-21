@@ -33,7 +33,7 @@ img {
 
 <style scoped>
 .toast-content {
-  font-size: 32x;
+  font-size: 16px;
   margin: auto;
   background-color: rgba(78, 78, 78, 0.472);
   color: white;

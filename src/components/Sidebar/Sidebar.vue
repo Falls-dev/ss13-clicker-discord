@@ -76,7 +76,7 @@
       />
       <sidebar-item id="settings" text="Settings" :icon="require('@/assets/art/sidebar/gear.png')" />
       <sidebar-item id="about" text="About" :icon="require('@/assets/art/misc/logo-square.png')" />
-      <a class href="https://discord.com/invite/HwbK9XQ" target="_blank">
+      <a class href="https://discord.com/invite/HwbK9XQ" target="_blank" @click="openDiscordInvite">
         <sidebar-item text="Discord" :icon="require('@/assets/art/misc/discord.png')" />
       </a>
     </div>
@@ -93,16 +93,23 @@ import { ALL_JOBS } from "@/data/jobs";
 import SidebarItem from "./SidebarItem";
 import InventoryPriceDisplay from "@/components/Content/Inventory/InventoryPriceDisplay";
 import { mapGetters } from "vuex";
+import { isDiscordActivity, openExternalLink } from "@/discord/activity";
 
 export default {
   name: "Sidebar",
   data() {
     return {
-      expanded: true
+      expanded: !isDiscordActivity()
     };
+  },
+  watch: {
+    visibleSidebarItem() {
+      if (this.overlayNav) this.expanded = false;
+    }
   },
   components: { SidebarItem, InventoryPriceDisplay },
   computed: {
+    ...mapGetters(["visibleSidebarItem"]),
     money() {
       return this.$store.getters["inventory/money"];
     },
@@ -142,9 +149,18 @@ export default {
     },
     chronoSpeed() {
       return this.$store.getters["chrono/speed"];
+    },
+    overlayNav() {
+      if (isDiscordActivity()) return true;
+      return typeof window !== "undefined" && window.innerWidth <= 768;
     }
   },
   methods: {
+    openDiscordInvite(event) {
+      if (!isDiscordActivity()) return;
+      event.preventDefault();
+      openExternalLink("https://discord.com/invite/HwbK9XQ");
+    },
     getLevelText(job) {
       return `${this.$store.getters[job.id + "/visualLevel"]}/50`;
     },
