@@ -12,7 +12,9 @@ ___
 
 ### Prerequsites
 
-You will need Git Bash as well as Node.js installed.
+**Node.js 22.5+ is required** (the server uses the built-in `node:sqlite` module). Node 20 will not start.
+
+You will need Git Bash as well as Node.js 22+ installed.
 
 If you do not already have Vue CLI installed, continue reading, otherwise skip to the next header.
 
@@ -58,11 +60,11 @@ In the Discord Developer Portal:
 - OAuth2 Redirect: `https://127.0.0.1`
 - URL Mapping: `/` → `spacestation13clicker.ss13.site`
 
-Saves are stored in local SQLite (`data/saves.sqlite`) keyed by Discord user ID, so the same account syncs between Discord desktop and Discord mobile.
+Saves are stored in SQLite (`data/saves.sqlite`) keyed by Discord user ID, so the same account syncs between Discord desktop and Discord mobile.
 
 Language: EN/RU toggle in the sidebar and Settings.
 
-Debug overlay: set `LOCAL_PLAYER=1` and `DEBUG=1` in `.env` (debug is ignored if `LOCAL_PLAYER` is off). Browser play also requires `LOCAL_PLAYER=1`; otherwise the game is Discord Activity only.
+Debug overlay exists only in `npm run serve` (development). Production builds do not include the debug panel, item spawner, or cheat controls. On the server, `DEBUG=1` is ignored unless `LOCAL_PLAYER=1`. Browser play also requires `LOCAL_PLAYER=1`; otherwise the game is Discord Activity only.
 
 Russian setup notes: `README_RU.md`.
 

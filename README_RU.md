@@ -4,7 +4,7 @@
 
 ## Что нужно
 
-- Node.js 22+
+- **Node.js 22.5+** (нужен встроенный `node:sqlite`; на Node 20 сервер не запустится)
 - nginx с сертификатом Let's Encrypt на `spacestation13clicker.ss13.site`
 - приложение Discord (Client ID и Client Secret уже в `.env`)
 
@@ -25,7 +25,7 @@ npm run serve
 ```
 
 Локальный браузер: `LOCAL_PLAYER=1` в `.env`. Если `LOCAL_PLAYER=0`, игра открывается только как Discord Activity, а `DEBUG` включить нельзя.
-Режим отладки: `LOCAL_PLAYER=1` и `DEBUG=1` в `.env` (или `?debug=1` при включённом `LOCAL_PLAYER`).
+Панель отладки есть только в `npm run serve`. В production-сборке (`npm run build`) дебаг, спавнер предметов и читы в клиент не попадают.
 
 ## nginx
 
@@ -51,7 +51,7 @@ sudo nginx -t && sudo systemctl reload nginx
 2. OAuth2 Redirect: `https://127.0.0.1`
 3. URL Mapping: `/` → `spacestation13clicker.ss13.site` (без порта)
 
-После входа Discord прогресс пишется в локальную SQLite (`data/saves.sqlite`) по ID пользователя. Телефон и компьютер с одним Discord-аккаунтом видят одно сохранение.
+После входа Discord прогресс пишется в SQLite (`data/saves.sqlite`) по ID пользователя. Телефон и компьютер с одним Discord-аккаунтом видят одно сохранение.
 
 ## Язык
 
