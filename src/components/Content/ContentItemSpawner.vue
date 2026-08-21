@@ -1,7 +1,7 @@
 <template>
   <div class="content-settings">
     <content-header
-      text="Item Spawner"
+      :text="$t('nav.itemSpawner')"
       :icon="require('@/assets/art/sidebar/gear.png')"
       color="rgb(231, 150, 28)"
     />

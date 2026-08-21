@@ -1,19 +1,11 @@
 <template>
   <div class="d-flex flex-column align-items-center m-3 text-center">
-    <h3 class="text-center mb-3">Welcome Back!</h3>
-    <span>
-      Your time offline has been converted for use at the
-      <img
-        :src="require('@/assets/art/chrono/icon.png')"
-        class="mx--1"
-      />
-      <b>Chronosphere</b>.
-    </span>
-    <span class="mt-2 description">TOTAL TIME AVAILABLE:</span>
+    <h3 class="text-center mb-3">{{ $t('modal.welcomeTitle') }}</h3>
+    <span>{{ $t('modal.welcomeBody') }}</span>
+    <span class="mt-2 description">{{ $t('modal.welcomeTime') }}</span>
     <span>{{remainingTimeText}}</span>
-    <span v-if="oldExport"><br><b class="chrono">You've earned an Export Bonus!</b><br>
-       Export your save to keep your data backed up and earn 30 extra minutes in your Time Bank.</span>
-    <button class="btn btn-primary mt-3" @click="confirmationClicked">OK</button>
+    <span v-if="oldExport"><br><b class="chrono">{{ $t('modal.welcomeExport') }}</b></span>
+    <button class="btn btn-primary mt-3" @click="confirmationClicked">{{ $t('modal.ok') }}</button>
   </div>
 </template>
 

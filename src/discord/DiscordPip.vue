@@ -46,16 +46,16 @@ export default {
       const enemyId = this.$store.getters["combat/targetEnemy"];
       if (enemyId) {
         const enemy = ENEMIES[enemyId];
-        return enemy && enemy.name ? "Fighting " + enemy.name : "In combat";
+        return enemy && enemy.name ? this.$t("pip.fighting", { name: enemy.name }) : this.$t("pip.fighting", { name: enemyId });
       }
       for (let i = 0; i < ALL_JOBS.length; i++) {
         const job = ALL_JOBS[i];
         if (job.isCombat) continue;
         if (this.$store.getters[job.id + "/active"]) {
-          return job.name || job.id;
+          return this.$jobName(job);
         }
       }
-      return "Idle";
+      return this.$t("pip.idle");
     }
   }
 };

@@ -1,6 +1,6 @@
 <template>
   <div class="content-shop">
-    <content-header text="Cargo" :icon="require('@/assets/art/sidebar/cargo.png')" color="#febb33" />
+    <content-header :text="$t('nav.cargo')" :icon="require('@/assets/art/sidebar/cargo.png')" color="#febb33" />
     <div class="content-container">
       <job-info
         infoId="shop"

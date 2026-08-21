@@ -17,8 +17,8 @@ export default {
   computed: {
     runText() {
       return this.$store.getters["enemyMob/health"]
-        ? "Yakety sax away"
-        : "Leave";
+        ? this.$t("combat.runAway")
+        : this.$t("combat.leave");
     }
   }
 };

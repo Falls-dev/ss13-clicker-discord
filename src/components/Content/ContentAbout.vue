@@ -1,7 +1,7 @@
 <template>
   <div>
     <content-header
-      text="About"
+      :text="$t('nav.about')"
       :icon="require('@/assets/art/misc/logo-square.png')"
       color="rgb(150, 150, 150)"
     />
@@ -9,54 +9,34 @@
       <div class="row">
         <div class="col-12">
           <div class="content-block">
-            <h4 class="mb-2">About</h4>
+            <h4 class="mb-2">{{ $t('about.title') }}</h4>
             <p>
               <img class="no-pixel mx--0" :src="require('@/assets/art/misc/logo-square.png')" />
-              <b>Space Station 13 Idle</b> is a game inspired by
-              <a href="https://melvoridle.com/">
-                <img class="no-pixel mx--0" :src="require('@/assets/art/misc/melvor.svg')" />
-                <b>Melvor Idle</b>
-              </a>, set in the
-              <img class="no-pixel mx--0" :src="require('@/assets/art/misc/clown.png')" />
-              <b>Space Station 13</b> universe.
+              {{ $t('about.p1') }}
             </p>
-            <p>This game is 100% free and open source (AGPL-3.0 License).</p>
-            <p>
-              If you want to contribute, head on down to the project's
-              <a
-                href="https://github.com/TBartl/space-station-13-idle/"
-              >
-                <img class="no-pixel mx--1" :src="require('@/assets/art/misc/github.png')" />
-                <b>GitHub Repository</b>
-              </a> (no programming experience is required).
-            </p>
-            <p>
-              Also, check out our
-              <a href="https://discord.com/invite/HwbK9XQ">
-                <img class="no-pixel mx--1" :src="require('@/assets/art/misc/discord.png')" />
-                <b>Discord Server</b>
-              </a>.
-            </p>
+            <p>{{ $t('about.p2') }}</p>
+            <p>{{ $t('about.p3') }}</p>
+            <p>{{ $t('about.p4') }}</p>
           </div>
           <div class="content-block mt-3">
-            <h4 class="mb-3">Credits</h4>
-            <h5>Developers</h5>
+            <h4 class="mb-3">{{ $t('about.credits') }}</h4>
+            <h5>{{ $t('about.developers') }}</h5>
             <div class="my-3">
               <img class="mx--0" :src="require('@/assets/art/jobinfo/fabrication.png')" alt />
               <b class="mr-2">Thomas "Tabski" Bartlett:</b>
-              <span>Programming</span>
+              <span>{{ $t('about.programming') }}</span>
             </div>
             <div class="my-3">
               <img class="mx--0" :src="require('@/assets/art/combat/enemies/badviro.png')" alt />
               <b class="mr-2">Nathan "Nabski" Bartlett:</b>
-              <span>Content and Balance</span>
+              <span>{{ $t('about.contentBalance') }}</span>
             </div>
             <div class="my-3">
               <img class="mx--0" :src="require('@/assets/art/misc/allFaces.gif')" alt />
               <b class="mr-2">GitHub Contributors:</b>
-              <span>Various Content and Tweaks</span>
+              <span>{{ $t('about.contributors') }}</span>
             </div>
-            <h5 class="mt-3">Other Great People</h5>
+            <h5 class="mt-3">{{ $t('about.otherPeople') }}</h5>
             <div class="my-3">
               <img class="mx--0" :src="require('@/assets/art/misc/melvor.svg')" alt />
               <b class="mr-2">Malcs (aka MrFrux):</b>

@@ -10,7 +10,7 @@
       <p class="text-uppercase text-center">{{actionTitle}}</p>
       <p
         class="action-time mt-1 text-center"
-      >{{action.xp | stat}} XP / {{action.time | stat}} SECONDS</p>
+      >{{action.xp | stat}} XP / {{action.time | stat}} {{ $t('action.sec') }}</p>
       <img :id="'action-icon-'+id" :src="icon" alt class="mt-2" />
       <!-- <b-popover :target="'action-icon-'+id" triggers="hover" placement="right" delay="0" :customClass="$store.getters['settings/darkModeClass']">
         <item-chance :data="action" />
@@ -19,17 +19,17 @@
       <p
         class="failure text-center mt-1"
         v-if="action.failure"
-      >{{action.failure.chance*100 | cleanNum}}% chance to fail and lose {{action.failure.damage}} health</p>
+      >{{ $t('action.failChance', { chance: action.failure.chance * 100, damage: action.failure.damage }) }}</p>
 
       <p
         class="failure text-center mt-1"
         v-if="action.healthCost"
-      >Costs {{action.healthCost}} health</p>
+      >{{ $t('action.healthCost', { hp: action.healthCost }) }}</p>
 
-			<p class="chrono" v-if="action.chronoProhibited">Chrono Prohibited</p>
+			<p class="chrono" v-if="action.chronoProhibited">{{ $t('action.chronoProhibited') }}</p>
 
-      <span v-if="locked" class="danger-bubble text-center mt-1">LEVEL {{action.requiredLevel}}
-        {{needsAbsentUpgrade ? " (NEEDS RESEARCH) " : ""}}
+      <span v-if="locked" class="danger-bubble text-center mt-1">{{ $t('action.level', { level: action.requiredLevel }) }}
+        {{needsAbsentUpgrade ? $t('action.needsResearch') : ""}}
       </span>
 
       <div class="d-flex flex-row align-items-center mt-2">
@@ -37,7 +37,7 @@
           <span
             class="danger-bubble color-weight text-light text-center mb-1"
             :class="hasItems ? 'orange-bubble' : 'danger-bubble'"
-          >USES</span>
+          >{{ $t('action.uses') }}</span>
           <item-requirement
             v-for="(entry, index) in Object.entries(action.requiredItems)"
             :key="index"
@@ -53,17 +53,17 @@
           <span
             class="color-weight text-light text-center"
             :class="hasItems ? 'primary-bubble' : 'secondary-bubble'"
-          >GIVES</span>
+          >{{ $t('action.gives') }}</span>
           <item-chance :data="action" :simplified="true" />
         </div>
       </div>
       <progress-bar class="mt-2" :progress="currentPercent" v-if="!locked && hasItems" />
     </div>
     <div v-else class="d-flex flex-column align-items-center">
-      <span>LOCKED</span>
+      <span>{{ $t('action.locked') }}</span>
       <img :src="require('@/assets/art/misc/airlock.png')" alt class="mt-2 mb-2" />
-      <span class="danger-bubble">LEVEL {{action.requiredLevel}}
-        {{action.levelReduced ? " (CHEM REDUCED) " : ""}}</span>
+      <span class="danger-bubble">{{ $t('action.level', { level: action.requiredLevel }) }}
+        {{action.levelReduced ? $t('action.chemReduced') : ""}}</span>
     </div>
   </div>
 </template>

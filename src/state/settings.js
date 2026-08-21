@@ -14,6 +14,7 @@ const settings = {
 		darkMode: true,
 		hideLockedJobs: false,
 		allButOne: false,
+		locale: "",
 	},
 	getters: {
 		showVirtualLevels(state) {
@@ -52,6 +53,9 @@ const settings = {
 		allButOne(state) {
 			return state.allButOne;
 		},
+		locale(state) {
+			return state.locale || "";
+		},
 	},
 	mutations: {
 		setShowVirtualLevels(state, val) {
@@ -86,6 +90,9 @@ const settings = {
 		},
 		setAllButOne(state, val) {
 			state.allButOne = val;
+		},
+		setLocale(state, val) {
+			state.locale = val === "ru" ? "ru" : "en";
 		}
 	}
 }

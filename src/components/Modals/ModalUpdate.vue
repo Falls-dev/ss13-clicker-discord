@@ -1,17 +1,17 @@
 <template>
   <div class="d-flex flex-column align-items-center m-3 text-center">
-    <h3 class="text-center mb-3">Update 1.4 Released!</h3>
+    <h3 class="text-center mb-3">{{ $t('modal.updateTitle') }}</h3>
 
     <img :src="require('@/assets/art/misc/changelog4.png')" />
 
     <span
       class="my-3"
-    >Full changelog of features, balance changes, and more are available on the Discord:</span>
+    >{{ $t('modal.updateBody') }}</span>
 
     <a class="discord" href="https://discord.com/invite/HwbK9XQ" target="_blank">
       <img :src="require('@/assets/art/misc/fake_discord.png')" />
     </a>
-    <button class="btn btn-primary mt-3" @click="confirmationClicked">Close</button>
+    <button class="btn btn-primary mt-3" @click="confirmationClicked">{{ $t('modal.close') }}</button>
   </div>
 </template>
 

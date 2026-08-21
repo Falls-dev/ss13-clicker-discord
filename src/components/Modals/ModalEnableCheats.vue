@@ -1,19 +1,19 @@
 <template>
   <div class="d-flex flex-column align-items-center m-5">
-    <h3 class="text-center">Are you sure you want to enable cheats?</h3>
+    <h3 class="text-center">{{ $t('modal.cheatsTitle') }}</h3>
 
     <div class="cheater my-3">
-      <p>You cheated not only the game, but yourself.</p>
-      <p>You experienced a hollow victory.</p>
-      <p>You didn't grow. You didn't improve.</p>
-      <p>You took a shortcut and gained nothing.</p>
-      <p>Nothing was risked and nothing was gained.</p>
-      <p>It's sad that you don't know the difference.</p>
+      <p>{{ $t('modal.cheatsLine1') }}</p>
+      <p>{{ $t('modal.cheatsLine2') }}</p>
+      <p>{{ $t('modal.cheatsLine3') }}</p>
+      <p>{{ $t('modal.cheatsLine4') }}</p>
+      <p>{{ $t('modal.cheatsLine5') }}</p>
+      <p>{{ $t('modal.cheatsLine6') }}</p>
     </div>
 
-    <h5 class="mb-3">THIS CANNOT BE REVERSED</h5>
+    <h5 class="mb-3">{{ $t('modal.cheatsIrreversible') }}</h5>
 
-    <button class="btn btn-danger" @click="enableCheats">Enable Cheats</button>
+    <button class="btn btn-danger" @click="enableCheats">{{ $t('modal.cheatsEnable') }}</button>
   </div>
 </template>
 

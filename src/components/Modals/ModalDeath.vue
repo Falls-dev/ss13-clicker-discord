@@ -1,18 +1,18 @@
 <template>
   <div class="d-flex flex-column align-items-center p-3 text-center">
-    <h4 class="my-1">You were knocked into</h4>
+    <h4 class="my-1">{{ $t('modal.deathTitle') }}</h4>
     <img class="mx--0 crit" :src="require('@/assets/art/combat/health-crit.gif')" />
     <div v-if="lostItem">
-      <p>While you were unconscious, someone stole something from you!</p>
-      <h4>You lost your</h4>
+      <p>{{ $t('modal.deathStolen') }}</p>
+      <h4>{{ $t('modal.deathLost') }}</h4>
       <h4>
         <img class="mx--0" :src="lostItem.icon" />
         {{lostItem.name}}!
       </h4>
     </div>
     <div v-else>
-      <p class="my-2">Thankfully, you didn't have any items equipped to lose.</p>
-      <h4>You lost nothing!</h4>
+      <p class="my-2">{{ $t('modal.deathNothingEquipped') }}</p>
+      <h4>{{ $t('modal.deathNothing') }}</h4>
     </div>
   </div>
 </template>

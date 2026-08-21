@@ -1,7 +1,7 @@
 <template>
   <div class="content-settings">
     <content-header
-      text="Completion"
+      :text="$t('nav.completion')"
       :icon="require('@/assets/art/sidebar/trophy.png')"
       color="rgb(231, 150, 28)"
     />
@@ -10,7 +10,7 @@
         <div class="col-12 mb-3" v-if="resets > 0">
           <div class="content-block content-block-top">
             <img :src="require('@/assets/art/chrono/bluetime.png')" class="mr-2" />
-            <span class="mr-1">Reset Count: {{resets}}</span>
+            <span class="mr-1">{{ $t('completion.resetCount', { count: resets }) }}</span>
           </div>
         </div>
         <div class="col-12">

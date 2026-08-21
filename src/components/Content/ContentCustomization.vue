@@ -1,7 +1,7 @@
 <template>
   <div>
     <content-header
-      text="Player"
+      :text="$t('nav.player')"
       :icon="require('@/assets/art/customization/icon.png')"
       color="rgb(150, 150, 150)"
     />

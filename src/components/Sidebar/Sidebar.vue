@@ -8,14 +8,14 @@
       </div>
       <p class="items-header">{{version}}</p>
 
-      <sidebar-item id="shop" text="Cargo" :icon="require('@/assets/art/sidebar/cargo.png')">
+      <sidebar-item id="shop" :text="$t('nav.cargo')" :icon="require('@/assets/art/sidebar/cargo.png')">
         <div>
           <inventory-price-display :price="money" />
         </div>
       </sidebar-item>
       <sidebar-item
         id="inventory"
-        text="Inventory"
+        :text="$t('nav.inventory')"
         :icon="require('@/assets/art/sidebar/backpack.png')"
         :textColor="bankItemIds.length == bankSlots ? 'rgb(255, 113, 113)' : ''"
       >
@@ -24,12 +24,12 @@
         >{{bankItemIds.length}}/{{bankSlots}}</span>
       </sidebar-item>
 
-      <p class="items-header">Jobs</p>
+      <p class="items-header">{{ $t('nav.jobs') }}</p>
       <sidebar-item
         v-for="job in nonCombatJobs"
         :key="job.id"
         :id="job.id"
-        :text="job.name"
+        :text="$jobName(job)"
         :icon="job.icon"
         :color="job.color"
         :textColor="getJobColor(job)"
@@ -39,14 +39,14 @@
       </sidebar-item>
 
       <div class="items-header flex-row align-items-center justify-content-between">
-        <span>Combat</span>
+        <span>{{ $t('nav.combat') }}</span>
         <span :style="healthStyle">({{playerHealth}}/{{playerMaxHealth}})</span>
       </div>
       <sidebar-item
         v-for="job in combatJobs"
         :key="job.id"
         id="combat"
-        :text="job.name"
+        :text="$jobName(job)"
         :icon="job.icon"
         :color="job.color"
         :textColor="getJobColor(job)"
@@ -55,15 +55,15 @@
         <span>{{getLevelText(job)}}</span>
       </sidebar-item>
 
-      <p class="items-header">Other</p>
+      <p class="items-header">{{ $t('nav.other') }}</p>
       <sidebar-item
         id="customization"
-        text="Player"
+        :text="$t('nav.player')"
         :icon="require('@/assets/art/customization/icon.png')"
       />
       <sidebar-item
         id="chronosphere"
-        text="Chronosphere"
+        :text="$t('nav.chronosphere')"
         :icon="require('@/assets/art/chrono/icon.png')"
         :textColor="chronoSpeed != 1 ? '#3ac5ff' : ''"
       >
@@ -71,14 +71,18 @@
       </sidebar-item>
       <sidebar-item
         id="completion"
-        text="Completion"
+        :text="$t('nav.completion')"
         :icon="require('@/assets/art/sidebar/trophy.png')"
       />
-      <sidebar-item id="settings" text="Settings" :icon="require('@/assets/art/sidebar/gear.png')" />
-      <sidebar-item id="about" text="About" :icon="require('@/assets/art/misc/logo-square.png')" />
+      <sidebar-item id="settings" :text="$t('nav.settings')" :icon="require('@/assets/art/sidebar/gear.png')" />
+      <sidebar-item id="about" :text="$t('nav.about')" :icon="require('@/assets/art/misc/logo-square.png')" />
       <a class href="https://discord.com/invite/HwbK9XQ" target="_blank" @click="openDiscordInvite">
-        <sidebar-item text="Discord" :icon="require('@/assets/art/misc/discord.png')" />
+        <sidebar-item :text="$t('nav.discord')" :icon="require('@/assets/art/misc/discord.png')" />
       </a>
+      <div class="lang-switch px-3 py-2">
+        <button class="btn btn-sm" :class="locale === 'en' ? 'btn-primary' : 'btn-secondary'" @click="setLang('en')">EN</button>
+        <button class="btn btn-sm ml-1" :class="locale === 'ru' ? 'btn-primary' : 'btn-secondary'" @click="setLang('ru')">RU</button>
+      </div>
     </div>
     <img
       class="button-toggle"
@@ -94,6 +98,7 @@ import SidebarItem from "./SidebarItem";
 import InventoryPriceDisplay from "@/components/Content/Inventory/InventoryPriceDisplay";
 import { mapGetters } from "vuex";
 import { isDiscordActivity, openExternalLink } from "@/discord/activity";
+import { setLocale } from "@/i18n";
 
 export default {
   name: "Sidebar",
@@ -153,6 +158,9 @@ export default {
     overlayNav() {
       if (isDiscordActivity()) return true;
       return typeof window !== "undefined" && window.innerWidth <= 768;
+    },
+    locale() {
+      return this.$i18n.locale;
     }
   },
   methods: {
@@ -160,6 +168,10 @@ export default {
       if (!isDiscordActivity()) return;
       event.preventDefault();
       openExternalLink("https://discord.com/invite/HwbK9XQ");
+    },
+    setLang(locale) {
+      setLocale(locale);
+      this.$store.commit("settings/setLocale", locale);
     },
     getLevelText(job) {
       return `${this.$store.getters[job.id + "/visualLevel"]}/50`;
@@ -299,5 +311,12 @@ a:focus {
     background-color: rgba(0, 0, 0, 0.5);
     pointer-events: all;
   }
+}
+.lang-switch {
+  display: flex;
+  align-items: center;
+}
+.lang-switch .btn {
+  min-width: 42px;
 }
 </style>

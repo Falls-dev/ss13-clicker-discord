@@ -1,7 +1,7 @@
 <template>
   <div class="content-inventory">
     <content-header
-      text="Inventory"
+      :text="$t('nav.inventory')"
       :icon="require('@/assets/art/sidebar/backpack.png')"
       color="rgb(218, 125, 29)"
     />

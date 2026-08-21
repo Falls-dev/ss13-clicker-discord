@@ -4,14 +4,17 @@ const https = require("https");
 const path = require("path");
 const express = require("express");
 const dotenv = require("dotenv");
+const db = require("./db");
 
 dotenv.config({ path: path.join(__dirname, "..", ".env") });
 
 const PORT = Number(process.env.PORT || 4443);
-const HOST = process.env.HOST || "0.0.0.0";
+const HOST = process.env.HOST || "127.0.0.1";
 const CLIENT_ID =
 	process.env.DISCORD_CLIENT_ID || process.env.VUE_APP_DISCORD_CLIENT_ID || "";
 const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || "";
+const DEBUG = String(process.env.DEBUG || "") === "1";
+const BEHIND_PROXY = String(process.env.BEHIND_PROXY || "1") !== "0";
 const DIST_PATH = path.join(__dirname, "..", "dist");
 
 function firstExistingFile(candidates) {
@@ -23,17 +26,16 @@ function firstExistingFile(candidates) {
 }
 
 function resolveTls() {
+	if (BEHIND_PROXY) return null;
 	const cert = firstExistingFile([
 		process.env.TLS_CERT,
 		path.join(__dirname, "..", "certs", "fullchain.pem"),
-		path.join(__dirname, "..", "certs", "cert.pem"),
-		"/etc/letsencrypt/live/spacestation13clicker.ss13.site/fullchain.pem"
+		path.join(__dirname, "..", "certs", "cert.pem")
 	]);
 	const key = firstExistingFile([
 		process.env.TLS_KEY,
 		path.join(__dirname, "..", "certs", "privkey.pem"),
-		path.join(__dirname, "..", "certs", "key.pem"),
-		"/etc/letsencrypt/live/spacestation13clicker.ss13.site/privkey.pem"
+		path.join(__dirname, "..", "certs", "key.pem")
 	]);
 	if (cert && key) {
 		return {
@@ -44,13 +46,30 @@ function resolveTls() {
 	return null;
 }
 
+function bearerToken(req) {
+	const header = req.headers.authorization || "";
+	if (header.indexOf("Bearer ") === 0) return header.slice(7).trim();
+	if (req.body && req.body.session_token) return req.body.session_token;
+	if (req.query && req.query.session_token) return req.query.session_token;
+	return "";
+}
+
+function requireSession(req, res, next) {
+	const session = db.getSession(bearerToken(req));
+	if (!session) {
+		return res.status(401).json({ error: "Unauthorized" });
+	}
+	req.session = session;
+	next();
+}
+
 const app = express();
 app.disable("x-powered-by");
-app.use(express.json({ limit: "32kb" }));
+app.use(express.json({ limit: "8mb" }));
 
 app.use(function (req, res, next) {
 	res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
-	res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+	res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 	res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
 	res.setHeader(
 		"Content-Security-Policy",
@@ -64,7 +83,8 @@ app.use(function (req, res, next) {
 function sendConfig(_req, res) {
 	res.json({
 		clientId: CLIENT_ID,
-		activity: true
+		activity: true,
+		debug: DEBUG
 	});
 }
 
@@ -98,24 +118,93 @@ async function exchangeToken(req, res) {
 				details: payload
 			});
 		}
-		return res.json({ access_token: payload.access_token });
+
+		const meResponse = await fetch("https://discord.com/api/users/@me", {
+			headers: { Authorization: "Bearer " + payload.access_token }
+		});
+		const user = await meResponse.json();
+		if (!meResponse.ok || !user.id) {
+			return res.status(502).json({ error: "Failed to fetch Discord user" });
+		}
+
+		const session_token = db.createSession(user);
+		return res.json({
+			access_token: payload.access_token,
+			session_token,
+			user: {
+				id: user.id,
+				username: user.username,
+				global_name: user.global_name,
+				locale: user.locale
+			}
+		});
 	} catch (err) {
 		return res.status(502).json({ error: "Discord token exchange failed" });
 	}
 }
 
 app.get("/api/health", function (_req, res) {
-	res.json({ ok: true });
+	res.json({ ok: true, debug: DEBUG, db: db.stats() });
 });
 app.get("/api/config", sendConfig);
 app.get("/.proxy/api/config", sendConfig);
 app.post("/api/token", exchangeToken);
 app.post("/.proxy/api/token", exchangeToken);
 
-if (!fs.existsSync(path.join(DIST_PATH, "index.html"))) {
-	console.warn(
-		"[discord] dist/ is missing. Run `npm run build` before `npm start`."
+function getSave(req, res) {
+	const current = db.getSave(req.session.userId);
+	if (!current) {
+		return res.json({ save: null, updatedAt: 0, revision: 0 });
+	}
+	return res.json(current);
+}
+
+function postSave(req, res) {
+	if (!req.body || typeof req.body.save !== "object") {
+		return res.status(400).json({ error: "Missing save payload" });
+	}
+	const result = db.putSave(
+		req.session.userId,
+		req.body.save,
+		req.body.updatedAt
 	);
+	if (result.conflict) {
+		return res.status(409).json({
+			error: "Newer save exists",
+			...result.current
+		});
+	}
+	return res.json({
+		ok: true,
+		updatedAt: result.updatedAt,
+		revision: result.revision
+	});
+}
+
+app.get("/api/save", requireSession, getSave);
+app.get("/.proxy/api/save", requireSession, getSave);
+app.post("/api/save", requireSession, postSave);
+app.post("/.proxy/api/save", requireSession, postSave);
+
+function debugSession(req, res) {
+	if (!DEBUG) return res.status(403).json({ error: "Debug is off" });
+	const userId = (req.body && req.body.userId) || "debug-local";
+	const session_token = db.createSession({
+		id: String(userId),
+		username: "debug",
+		locale: "en"
+	});
+	return res.json({
+		session_token,
+		user: { id: String(userId), username: "debug", global_name: "Debug" }
+	});
+}
+
+app.post("/api/debug/session", debugSession);
+app.post("/.proxy/api/debug/session", debugSession);
+
+if (!fs.existsSync(path.join(DIST_PATH, "index.html"))) {
+	console.warn("[discord] dist/ is missing. Run `npm run build` before `npm start`.");
 }
 
 app.use(express.static(DIST_PATH));
@@ -132,23 +221,11 @@ const server = tls ? https.createServer(tls, app) : http.createServer(app);
 const protocol = tls ? "https" : "http";
 
 server.listen(PORT, HOST, function () {
-	console.log(
-		"[discord] SS13 Idle listening on " + protocol + "://" + HOST + ":" + PORT
-	);
-	console.log(
-		"[discord] Public URL: https://spacestation13clicker.ss13.site:" + PORT
-	);
-	if (!tls) {
-		console.warn(
-			"[discord] No TLS cert found. Discord Activities need HTTPS on this port."
-		);
-		console.warn(
-			"[discord] Put fullchain.pem + privkey.pem in ./certs or set TLS_CERT / TLS_KEY."
-		);
-	}
+	console.log("[ss13-idle] listening on " + protocol + "://" + HOST + ":" + PORT);
+	console.log("[ss13-idle] public URL: https://spacestation13clicker.ss13.site");
+	console.log("[ss13-idle] sqlite: " + db.DB_PATH);
+	if (DEBUG) console.log("[ss13-idle] DEBUG mode enabled");
 	if (!CLIENT_ID || !CLIENT_SECRET) {
-		console.warn(
-			"[discord] Set DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET in .env"
-		);
+		console.warn("[ss13-idle] Set DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET in .env");
 	}
 });

@@ -1,7 +1,7 @@
 <template>
   <div>
     <content-header
-      text="Combat"
+      :text="$t('combat.title')"
       :icon="require('@/assets/art/combat/combatIcon.png')"
       color="rgb(175, 99, 99)"
     />
@@ -40,7 +40,7 @@
           <zone :zone="normZone" class="mb-3" />
         </div>
         <div class="col-12 mt-2 d-flex flex-row align-items-center">
-          <h2 class="text-white">BOSSES</h2>
+          <h2 class="text-white">{{ $t('combat.bosses') }}</h2>
         </div>
         <div
           class="col-12 col-lg-6 col-xl-4"
