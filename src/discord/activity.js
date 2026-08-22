@@ -385,34 +385,76 @@ export async function initDiscordActivity() {
 
 let authInFlight = null;
 
-// Discord Activities use this placeholder; it must be listed under
-// OAuth2 → Redirects and sent both in authorize() and the token exchange.
+// Activity token exchange uses the portal placeholder. RPC authorize itself
+// must not send https://127.0.0.1 — Discord rejects it with
+// "Redirect URI cannot be used in the RPC OAuth2 Authorization flow".
 const ACTIVITY_REDIRECT_URI = "https://127.0.0.1";
+const RPC_REDIRECT_URIS = ["http://127.0.0.1/callback", "http://127.0.0.1"];
 
-async function authorizeCode(clientId) {
-	const redirectUri = ACTIVITY_REDIRECT_URI;
-	authLog("authorize start", {
-		clientIdLen: (clientId || "").length,
-		redirectUri: redirectUri
-	});
-	const result = await discordSdk.commands.authorize({
+function errorText(err) {
+	if (!err) return "";
+	if (typeof err === "string") return err;
+	if (err.message) return String(err.message);
+	try {
+		return JSON.stringify(err);
+	} catch (jsonErr) {
+		return String(err);
+	}
+}
+
+function isRedirectAuthorizeError(err) {
+	const msg = errorText(err);
+	return /redirect_uri/i.test(msg) || /RPC OAuth2/i.test(msg);
+}
+
+async function authorizeOnce(clientId, redirectUri) {
+	const args = {
 		client_id: clientId,
 		response_type: "code",
 		state: "",
 		prompt: "none",
-		scope: ["identify"],
-		redirect_uri: redirectUri
-	});
+		scope: ["identify"]
+	};
+	if (redirectUri) args.redirect_uri = redirectUri;
+	authLog("authorize try", { redirectUri: redirectUri || "(omit)" });
+	const result = await discordSdk.commands.authorize(args);
 	authLog("authorize result", {
 		hasCode: Boolean(result && result.code),
 		keys: result ? Object.keys(result).join(",") : "",
-		redirectUri: redirectUri,
+		redirectUri: redirectUri || "(omit)",
 		code: result && result.code
 	});
 	if (!result || !result.code) {
 		throw new Error("Discord authorize returned no code");
 	}
-	return { code: result.code, redirectUri: redirectUri };
+	return {
+		code: result.code,
+		redirectUri: redirectUri || ACTIVITY_REDIRECT_URI
+	};
+}
+
+async function authorizeCode(clientId) {
+	authLog("authorize start", { clientIdLen: (clientId || "").length });
+	try {
+		return await authorizeOnce(clientId, null);
+	} catch (err) {
+		authLog("authorize default failed", { error: errorText(err) });
+		if (!isRedirectAuthorizeError(err)) throw err;
+	}
+
+	let lastError = null;
+	for (let i = 0; i < RPC_REDIRECT_URIS.length; i++) {
+		try {
+			return await authorizeOnce(clientId, RPC_REDIRECT_URIS[i]);
+		} catch (err) {
+			lastError = err;
+			authLog("authorize rpc uri failed", {
+				redirectUri: RPC_REDIRECT_URIS[i],
+				error: errorText(err)
+			});
+		}
+	}
+	throw lastError || new Error("Discord authorize returned no code");
 }
 
 async function authenticateUser(clientId) {

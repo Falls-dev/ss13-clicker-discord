@@ -210,6 +210,7 @@ async function exchangeToken(req, res) {
 		}
 		addRedirectTry(requestedRedirect && String(requestedRedirect));
 		addRedirectTry("https://127.0.0.1");
+		addRedirectTry("http://127.0.0.1/callback");
 		addRedirectTry("http://127.0.0.1");
 		addRedirectTry("https://" + CLIENT_ID + ".discordsays.com");
 		redirectTries.push({});
