@@ -12,8 +12,7 @@ export const discordState = Vue.observable({
 	layoutMode: LAYOUT_FOCUSED,
 	debug: false,
 	localPlayer: false,
-	authError: "",
-	authLog: []
+	authError: ""
 });
 
 let discordSdk = null;
@@ -39,51 +38,8 @@ function applyDiscordClass() {
 	if (document.body) document.body.classList.add("discord-activity");
 }
 
-function sanitizeAuthData(data) {
-	if (!data || typeof data !== "object") return data;
-	const out = {};
-	Object.keys(data).forEach(function (key) {
-		const val = data[key];
-		if (val == null) {
-			out[key] = val;
-			return;
-		}
-		if (key === "code" || key === "access_token" || key === "session_token") {
-			const str = String(val);
-			out[key + "Len"] = str.length;
-			out[key + "Prefix"] = str.slice(0, 4);
-			return;
-		}
-		if (typeof val === "string" && val.length > 240) {
-			out[key] = val.slice(0, 240) + "…";
-			return;
-		}
-		out[key] = val;
-	});
-	return out;
-}
-
-export function authLog(msg, data) {
-	const line = {
-		t: new Date().toISOString(),
-		msg: String(msg || ""),
-		data: sanitizeAuthData(data)
-	};
-	discordState.authLog.push(line);
-	if (discordState.authLog.length > 50) discordState.authLog.shift();
-	console.warn("[auth]", line.t, line.msg, line.data || "");
-	if (typeof fetch !== "function") return;
-	const body = JSON.stringify(line);
-	const urls = isDiscordActivity()
-		? ["/.proxy/api/auth-log", "https://spacestation13clicker.ss13.site/api/auth-log"]
-		: ["/api/auth-log"];
-	urls.forEach(function (url) {
-		fetch(url, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: body
-		}).catch(function () {});
-	});
+export function isDiscordSignedIn() {
+	return Boolean(discordState.user || discordState.sessionToken);
 }
 
 if (typeof document !== "undefined" && isDiscordActivity()) {
@@ -113,23 +69,10 @@ async function discordFetch(path, options) {
 	} else {
 		urls.push(path);
 	}
-	const logThis =
-		path.indexOf("/api/token") === 0 ||
-		path.indexOf("/api/config") === 0 ||
-		path.indexOf("/api/me") === 0;
 	let lastError = null;
 	for (let i = 0; i < urls.length; i++) {
 		try {
-			if (logThis) authLog("fetch try", { path: path, url: urls[i], method: method });
 			const response = await fetch(urls[i], opts);
-			if (logThis) {
-				authLog("fetch status", {
-					path: path,
-					url: urls[i],
-					status: response.status,
-					ok: response.ok
-				});
-			}
 			if (response.ok || response.status === 409) return response;
 			let snippet = "";
 			try {
@@ -138,16 +81,8 @@ async function discordFetch(path, options) {
 				snippet = "";
 			}
 			lastError = new Error(path + " -> " + response.status + (snippet ? " " + snippet : ""));
-			if (logThis) authLog("fetch fail body", { path: path, status: response.status, snippet: snippet });
 			if (isWrite && response.status !== 404 && response.status !== 405) break;
 		} catch (err) {
-			if (logThis) {
-				authLog("fetch error", {
-					path: path,
-					url: urls[i],
-					error: err && err.message
-				});
-			}
 			lastError = err;
 			if (isWrite && urls.length === i + 1) break;
 			if (isWrite && path.indexOf("/api/token") !== 0) break;
@@ -283,29 +218,16 @@ async function loadEmbeddedAppSdk() {
 }
 
 export async function initDiscordActivity() {
-	if (!isDiscordActivity()) {
-		authLog("skip init: not discord activity", {
-			host: typeof window !== "undefined" ? window.location.hostname : "",
-			search: typeof window !== "undefined" ? window.location.search : ""
-		});
-		return null;
-	}
+	if (!isDiscordActivity()) return null;
 
 	applyDiscordClass();
 	discordState.active = true;
 	restoreSession();
-	authLog("init start", {
-		host: window.location.hostname,
-		href: window.location.href.slice(0, 180),
-		hasSession: Boolean(discordState.sessionToken),
-		userId: discordState.user && discordState.user.id
-	});
 
 	const clientId = await resolveClientId();
-	authLog("client id", { clientId: clientId, len: (clientId || "").length });
 	if (!clientId) {
-		authLog("missing client id");
 		console.warn("[discord] Missing client id. Set DISCORD_CLIENT_ID on the server.");
+		discordState.authError = "missing-client-id";
 		return null;
 	}
 
@@ -314,10 +236,6 @@ export async function initDiscordActivity() {
 	let Events;
 	try {
 		const sdk = await loadEmbeddedAppSdk();
-		authLog("sdk loaded", {
-			hasSdk: Boolean(sdk),
-			keys: sdk ? Object.keys(sdk).slice(0, 12).join(",") : ""
-		});
 		if (!sdk || !sdk.DiscordSDK) {
 			throw new Error("DiscordEmbeddedAppSdk.DiscordSDK is missing");
 		}
@@ -325,35 +243,28 @@ export async function initDiscordActivity() {
 		Common = sdk.Common;
 		Events = sdk.Events;
 	} catch (err) {
-		authLog("sdk load failed", { error: err && err.message });
 		console.warn("[discord] Failed to load Embedded App SDK", err);
+		discordState.authError = "sdk-failed";
 		return null;
 	}
 
 	discordSdk = new DiscordSDK(clientId);
-	authLog("sdk constructed");
 
 	try {
 		await discordSdk.ready();
 		discordState.ready = true;
-		authLog("sdk ready");
 	} catch (err) {
-		authLog("sdk ready failed", { error: err && err.message });
 		console.warn("[discord] SDK ready() failed", err);
+		discordState.authError = "sdk-ready-failed";
 		return discordSdk;
 	}
 
 	try {
 		await authenticateUser(clientId);
 		discordState.authError = "";
-		authLog("authenticateUser ok", {
-			hasSession: Boolean(discordState.sessionToken),
-			userId: discordState.user && discordState.user.id
-		});
 	} catch (err) {
 		discordState.authError = (err && err.message) || "oauth-failed";
-		authLog("authenticateUser failed", { error: err && err.message });
-		console.warn("[discord] OAuth failed, continuing with saved session if any", err);
+		console.warn("[discord] OAuth failed", err);
 	}
 
 	if (discordState.sessionToken) {
@@ -407,23 +318,16 @@ function isRedirectAuthorizeError(err) {
 	return /redirect_uri/i.test(msg) || /RPC OAuth2/i.test(msg);
 }
 
-async function authorizeOnce(clientId, redirectUri) {
+async function authorizeOnce(clientId, redirectUri, forcePrompt) {
 	const args = {
 		client_id: clientId,
 		response_type: "code",
 		state: "",
-		prompt: "none",
 		scope: ["identify"]
 	};
+	if (!forcePrompt) args.prompt = "none";
 	if (redirectUri) args.redirect_uri = redirectUri;
-	authLog("authorize try", { redirectUri: redirectUri || "(omit)" });
 	const result = await discordSdk.commands.authorize(args);
-	authLog("authorize result", {
-		hasCode: Boolean(result && result.code),
-		keys: result ? Object.keys(result).join(",") : "",
-		redirectUri: redirectUri || "(omit)",
-		code: result && result.code
-	});
 	if (!result || !result.code) {
 		throw new Error("Discord authorize returned no code");
 	}
@@ -433,57 +337,43 @@ async function authorizeOnce(clientId, redirectUri) {
 	};
 }
 
-async function authorizeCode(clientId) {
-	authLog("authorize start", { clientIdLen: (clientId || "").length });
+async function authorizeCode(clientId, forcePrompt) {
 	try {
-		return await authorizeOnce(clientId, null);
+		return await authorizeOnce(clientId, null, forcePrompt);
 	} catch (err) {
-		authLog("authorize default failed", { error: errorText(err) });
 		if (!isRedirectAuthorizeError(err)) throw err;
 	}
 
 	let lastError = null;
 	for (let i = 0; i < RPC_REDIRECT_URIS.length; i++) {
 		try {
-			return await authorizeOnce(clientId, RPC_REDIRECT_URIS[i]);
+			return await authorizeOnce(clientId, RPC_REDIRECT_URIS[i], forcePrompt);
 		} catch (err) {
 			lastError = err;
-			authLog("authorize rpc uri failed", {
-				redirectUri: RPC_REDIRECT_URIS[i],
-				error: errorText(err)
-			});
 		}
 	}
 	throw lastError || new Error("Discord authorize returned no code");
 }
 
-async function authenticateUser(clientId) {
+async function authenticateUser(clientId, forcePrompt) {
 	if (authInFlight) return authInFlight;
-	authInFlight = authenticateUserOnce(clientId).finally(function () {
+	authInFlight = authenticateUserOnce(clientId, forcePrompt).finally(function () {
 		authInFlight = null;
 	});
 	return authInFlight;
 }
 
-async function authenticateUserOnce(clientId) {
+async function authenticateUserOnce(clientId, forcePrompt) {
 	if (discordState.sessionToken) {
-		authLog("trying existing session");
 		const existing = await fetchSessionUser();
 		if (existing && existing.id) {
 			discordState.authError = "";
-			authLog("existing session ok", { userId: existing.id });
 			return existing;
 		}
-		authLog("existing session invalid, clearing");
 		clearSession();
 	}
 
-	const authorized = await authorizeCode(clientId);
-	authLog("posting /api/token", {
-		code: authorized.code,
-		redirect_uri: authorized.redirectUri
-	});
-
+	const authorized = await authorizeCode(clientId, forcePrompt);
 	const tokenResponse = await discordFetch("/api/token", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
@@ -493,14 +383,6 @@ async function authenticateUserOnce(clientId) {
 		})
 	});
 	const payload = await tokenResponse.json();
-	authLog("token payload", {
-		keys: payload ? Object.keys(payload).join(",") : "",
-		error: payload && payload.error,
-		hasAccess: Boolean(payload && payload.access_token),
-		hasSession: Boolean(payload && payload.session_token),
-		access_token: payload && payload.access_token,
-		session_token: payload && payload.session_token
-	});
 	if (!payload || !payload.access_token || !payload.session_token) {
 		throw new Error((payload && payload.error) || "Token exchange returned no access_token");
 	}
@@ -512,17 +394,14 @@ async function authenticateUserOnce(clientId) {
 	}
 
 	try {
-		authLog("sdk authenticate start");
 		const auth = await discordSdk.commands.authenticate({
 			access_token: payload.access_token
 		});
-		authLog("sdk authenticate ok", { userId: auth && auth.user && auth.user.id });
 		if (auth && auth.user) {
 			setDiscordUser(Object.assign({}, payload.user || {}, auth.user));
 		}
 		return auth;
 	} catch (err) {
-		authLog("sdk authenticate failed, using server session", { error: err && err.message });
 		console.warn("[discord] SDK authenticate() failed; using server session", err);
 		return payload;
 	}
@@ -533,7 +412,7 @@ export async function retryDiscordLogin() {
 	const clientId = await resolveClientId();
 	if (!clientId) throw new Error("Missing Discord client id");
 	clearSession();
-	return authenticateUser(clientId);
+	return authenticateUser(clientId, true);
 }
 
 export async function openExternalLink(url) {

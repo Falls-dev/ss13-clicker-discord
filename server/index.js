@@ -276,12 +276,6 @@ async function exchangeToken(req, res) {
 	}
 }
 
-function receiveAuthLog(req, res) {
-	const line = req.body || {};
-	console.warn("[auth-client]", line.t || "", line.msg || "", JSON.stringify(line.data || {}));
-	return res.json({ ok: true });
-}
-
 app.get("/api/health", function (_req, res) {
 	res.json({ ok: true });
 });
@@ -289,8 +283,6 @@ app.get("/api/config", sendConfig);
 app.get("/.proxy/api/config", sendConfig);
 app.post("/api/token", exchangeToken);
 app.post("/.proxy/api/token", exchangeToken);
-app.post("/api/auth-log", receiveAuthLog);
-app.post("/.proxy/api/auth-log", receiveAuthLog);
 
 function getSave(req, res) {
 	const current = db.getSave(req.session.userId);

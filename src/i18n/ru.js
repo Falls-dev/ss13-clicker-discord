@@ -66,8 +66,7 @@ export default {
 		cloudLastSync: "Последняя синхронизация: {time}",
 		cloudNever: "никогда",
 		forceSync: "Сохранить в облако сейчас",
-		retryLogin: "Повторить вход через Discord",
-		authLog: "Временный лог входа (скиньте его, если вход не проходит)"
+		retryLogin: "Повторить вход через Discord"
 	},
 	cheats: {
 		title: "ЧИТЫ",
@@ -309,7 +308,10 @@ export default {
 	},
 	gate: {
 		body: "Эта игра — Discord Activity. Зайдите через Discord, чтобы играть.",
-		openDiscord: "Открыть Discord"
+		openDiscord: "Открыть Discord",
+		authRequired: "Чтобы продолжить игру, нужно пройти авторизацию Discord. Если вы отказались — нажмите кнопку и подтвердите доступ.",
+		authorize: "Пройти авторизацию",
+		authorizing: "Авторизация…"
 	},
 	equipment: {
 		face: "лицо",

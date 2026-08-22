@@ -66,8 +66,7 @@ export default {
 		cloudLastSync: "Last sync: {time}",
 		cloudNever: "never",
 		forceSync: "Save to cloud now",
-		retryLogin: "Try Discord login again",
-		authLog: "Temporary login log (send this if Discord login fails)"
+		retryLogin: "Try Discord login again"
 	},
 	cheats: {
 		title: "CHEATS",
@@ -309,7 +308,10 @@ export default {
 	},
 	gate: {
 		body: "This game is a Discord Activity. Open it from Discord to play.",
-		openDiscord: "Open Discord"
+		openDiscord: "Open Discord",
+		authRequired: "You need to authorize through Discord to continue playing. If you declined the prompt, tap the button and grant access.",
+		authorize: "Authorize",
+		authorizing: "Authorizing…"
 	},
 	equipment: {
 		face: "face",

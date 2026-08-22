@@ -24,7 +24,7 @@ import ModalWelcomeBack from "@/components/Modals/ModalWelcomeBack";
 import PanelsContainer from "@/components/Panels/PanelsContainer";
 import DiscordPip from "@/discord/DiscordPip.vue";
 import DiscordGate from "@/components/DiscordGate.vue";
-import { discordState, LAYOUT_FOCUSED, isDiscordActivity } from "@/discord/activity";
+import { discordState, LAYOUT_FOCUSED, isDiscordActivity, isDiscordSignedIn } from "@/discord/activity";
 import { mapGetters, mapMutations } from "vuex";
 
 const debugComponents = {};
@@ -55,24 +55,34 @@ export default {
       return process.env.NODE_ENV !== "production" && discordState.debug && discordState.localPlayer;
     },
     showDiscordGate() {
-      return !discordState.localPlayer && !isDiscordActivity();
+      if (discordState.localPlayer) return false;
+      if (!isDiscordActivity()) return true;
+      return !isDiscordSignedIn();
     }
   },
   methods: {
-    ...mapMutations(["setWelcomeMessageSeen"])
+    ...mapMutations(["setWelcomeMessageSeen"]),
+    openStartupModals() {
+      if (this.showDiscordGate || this.isPip) return;
+      if (!this.$store.state.update4Seen) {
+        this.$modal.show(ModalUpdate, {}, { height: "auto", width: "360px" });
+        this.$store.state.update4Seen = true;
+      } else if (this.$store.getters["chrono/showWelcomeBack"]) {
+        this.$modal.show(
+          ModalWelcomeBack,
+          {},
+          { height: "auto", width: "400px" }
+        );
+      }
+    }
+  },
+  watch: {
+    showDiscordGate(now, was) {
+      if (was && !now) this.openStartupModals();
+    }
   },
   mounted() {
-    if (this.showDiscordGate || this.isPip) return;
-    if (!this.$store.state.update4Seen) {
-      this.$modal.show(ModalUpdate, {}, { height: "auto", width: "360px" });
-      this.$store.state.update4Seen = true;
-    } else if (this.$store.getters["chrono/showWelcomeBack"]) {
-      this.$modal.show(
-        ModalWelcomeBack,
-        {},
-        { height: "auto", width: "400px" }
-      );
-    }
+    this.openStartupModals();
   }
 };
 </script>

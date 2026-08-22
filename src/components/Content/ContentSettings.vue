@@ -27,8 +27,6 @@
                 @click="retryLogin"
               >{{ $t('settings.retryLogin') }}</button>
               <button type="button" class="btn btn-primary my-1 d-block" @click="forceCloudSave">{{ $t('settings.forceSync') }}</button>
-              <p v-if="authLogText" class="mb-1 mt-2">{{ $t('settings.authLog') }}</p>
-              <pre v-if="authLogText" class="auth-log mt-0 mb-0">{{ authLogText }}</pre>
             </div>
             <button
               type="button"
@@ -322,16 +320,6 @@ export default {
     showRetryLogin() {
       if (!this.discordState.active) return false;
       return !(this.discordState.user || getSessionToken() || this.discordState.sessionToken);
-    },
-    authLogText() {
-      const lines = this.discordState.authLog || [];
-      if (!lines.length) return "";
-      return lines
-        .map(function (line) {
-          const data = line.data ? " " + JSON.stringify(line.data) : "";
-          return (line.t || "") + " " + (line.msg || "") + data;
-        })
-        .join("\n");
     }
   },
   methods: {
@@ -359,18 +347,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.auth-log {
-  max-height: 220px;
-  overflow: auto;
-  padding: 0.6rem 0.7rem;
-  font-size: 11px;
-  line-height: 1.35;
-  white-space: pre-wrap;
-  word-break: break-word;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 4px;
-}
-</style>

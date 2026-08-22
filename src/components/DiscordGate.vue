@@ -3,8 +3,22 @@
     <div class="gate-card">
       <img src="@/assets/art/misc/logo.png" alt="" />
       <h2>Space Clicker 13</h2>
-      <p>{{ $t("gate.body") }}</p>
-      <a class="btn btn-primary" href="https://discord.com/invite/HwbK9XQ" @click="openInvite">
+      <p>{{ needsAuth ? $t("gate.authRequired") : $t("gate.body") }}</p>
+      <button
+        v-if="needsAuth"
+        type="button"
+        class="btn btn-primary"
+        :disabled="busy"
+        @click="retryAuth"
+      >
+        {{ busy ? $t("gate.authorizing") : $t("gate.authorize") }}
+      </button>
+      <a
+        v-else
+        class="btn btn-primary"
+        href="https://discord.com/invite/HwbK9XQ"
+        @click="openInvite"
+      >
         {{ $t("gate.openDiscord") }}
       </a>
     </div>
@@ -12,13 +26,41 @@
 </template>
 
 <script>
-import { openExternalLink } from "@/discord/activity";
+import { discordState, isDiscordActivity, openExternalLink, retryDiscordLogin, getSessionToken } from "@/discord/activity";
+import { hydrateFromCloud, pushToCloud } from "@/state/cloudSave";
+
 export default {
   name: "DiscordGate",
+  data() {
+    return {
+      discordState,
+      busy: false
+    };
+  },
+  computed: {
+    needsAuth() {
+      return isDiscordActivity() && !(this.discordState.user || this.discordState.sessionToken);
+    }
+  },
   methods: {
     openInvite(event) {
       event.preventDefault();
       openExternalLink("https://discord.com/invite/HwbK9XQ");
+    },
+    async retryAuth() {
+      if (this.busy) return;
+      this.busy = true;
+      try {
+        await retryDiscordLogin();
+        if (getSessionToken() || this.discordState.sessionToken) {
+          await hydrateFromCloud(this.$store);
+          pushToCloud(this.$store, true);
+        }
+      } catch (err) {
+        this.discordState.authError = (err && err.message) || "oauth-failed";
+      } finally {
+        this.busy = false;
+      }
     }
   }
 };
