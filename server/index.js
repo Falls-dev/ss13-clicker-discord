@@ -173,7 +173,12 @@ async function exchangeToken(req, res) {
 		console.warn("[auth] missing oauth code", { bodyType: typeof req.body });
 		return res.status(400).json({ error: "Missing OAuth code" });
 	}
-	console.warn("[auth] exchanging code", { codeLen: String(code).length, codePrefix: String(code).slice(0, 4) });
+	const requestedRedirect = req.body && req.body.redirect_uri;
+	console.warn("[auth] exchanging code", {
+		codeLen: String(code).length,
+		codePrefix: String(code).slice(0, 4),
+		requestedRedirect: requestedRedirect || ""
+	});
 
 	try {
 		async function requestDiscordToken(extra) {
@@ -198,12 +203,16 @@ async function exchangeToken(req, res) {
 		// Activity OAuth codes are bound to the portal placeholder https://127.0.0.1.
 		// A mismatch often comes back as invalid_grant; keep trying other redirect_uri
 		// values because Discord does not always consume the code on redirect errors.
-		const redirectTries = [
-			{ redirect_uri: "https://127.0.0.1" },
-			{ redirect_uri: "http://127.0.0.1" },
-			{ redirect_uri: "https://" + CLIENT_ID + ".discordsays.com" },
-			{}
-		];
+		const redirectTries = [];
+		function addRedirectTry(uri) {
+			if (uri && redirectTries.some(function (item) { return item.redirect_uri === uri; })) return;
+			if (uri) redirectTries.push({ redirect_uri: uri });
+		}
+		addRedirectTry(requestedRedirect && String(requestedRedirect));
+		addRedirectTry("https://127.0.0.1");
+		addRedirectTry("http://127.0.0.1");
+		addRedirectTry("https://" + CLIENT_ID + ".discordsays.com");
+		redirectTries.push({});
 		let exchanged = { response: { ok: false, status: 0 }, payload: {} };
 		let usedTry = -1;
 		for (let i = 0; i < redirectTries.length; i++) {

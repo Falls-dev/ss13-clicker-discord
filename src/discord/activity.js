@@ -385,24 +385,34 @@ export async function initDiscordActivity() {
 
 let authInFlight = null;
 
+// Discord Activities use this placeholder; it must be listed under
+// OAuth2 → Redirects and sent both in authorize() and the token exchange.
+const ACTIVITY_REDIRECT_URI = "https://127.0.0.1";
+
 async function authorizeCode(clientId) {
-	authLog("authorize start", { clientIdLen: (clientId || "").length });
+	const redirectUri = ACTIVITY_REDIRECT_URI;
+	authLog("authorize start", {
+		clientIdLen: (clientId || "").length,
+		redirectUri: redirectUri
+	});
 	const result = await discordSdk.commands.authorize({
 		client_id: clientId,
 		response_type: "code",
 		state: "",
 		prompt: "none",
-		scope: ["identify"]
+		scope: ["identify"],
+		redirect_uri: redirectUri
 	});
 	authLog("authorize result", {
 		hasCode: Boolean(result && result.code),
 		keys: result ? Object.keys(result).join(",") : "",
+		redirectUri: redirectUri,
 		code: result && result.code
 	});
 	if (!result || !result.code) {
 		throw new Error("Discord authorize returned no code");
 	}
-	return result.code;
+	return { code: result.code, redirectUri: redirectUri };
 }
 
 async function authenticateUser(clientId) {
@@ -426,13 +436,19 @@ async function authenticateUserOnce(clientId) {
 		clearSession();
 	}
 
-	const code = await authorizeCode(clientId);
-	authLog("posting /api/token", { code: code });
+	const authorized = await authorizeCode(clientId);
+	authLog("posting /api/token", {
+		code: authorized.code,
+		redirect_uri: authorized.redirectUri
+	});
 
 	const tokenResponse = await discordFetch("/api/token", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ code })
+		body: JSON.stringify({
+			code: authorized.code,
+			redirect_uri: authorized.redirectUri
+		})
 	});
 	const payload = await tokenResponse.json();
 	authLog("token payload", {
