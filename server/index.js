@@ -148,20 +148,45 @@ async function exchangeToken(req, res) {
 	}
 
 	try {
-		const response = await fetch("https://discord.com/api/oauth2/token", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded"
-			},
-			body: new URLSearchParams({
+		async function requestDiscordToken(extra) {
+			const params = Object.assign({
 				client_id: CLIENT_ID,
 				client_secret: CLIENT_SECRET,
 				grant_type: "authorization_code",
 				code: req.body.code
-			})
-		});
-		const payload = await response.json();
-		if (!response.ok || !payload.access_token) {
+			}, extra || {});
+			const response = await fetch("https://discord.com/api/oauth2/token", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded"
+				},
+				body: new URLSearchParams(params)
+			});
+			const payload = await response.json();
+			return { response: response, payload: payload };
+		}
+
+		// Discord Activities register https://127.0.0.1 as a placeholder redirect.
+		// Try official (no redirect), then that placeholder, then the Activity origin.
+		const redirectTries = [
+			{},
+			{ redirect_uri: "https://127.0.0.1" },
+			{ redirect_uri: "https://" + CLIENT_ID + ".discordsays.com" }
+		];
+		let exchanged = { response: { ok: false, status: 0 }, payload: {} };
+		for (let i = 0; i < redirectTries.length; i++) {
+			exchanged = await requestDiscordToken(redirectTries[i]);
+			if (exchanged.response.ok && exchanged.payload && exchanged.payload.access_token) break;
+			if (exchanged.payload && exchanged.payload.error === "invalid_grant") break;
+		}
+		const payload = exchanged.payload;
+		if (!exchanged.response.ok || !payload.access_token) {
+			console.warn(
+				"[ss13-idle] Discord token exchange failed",
+				exchanged.response.status,
+				payload && payload.error,
+				payload && payload.error_description
+			);
 			return res.status(502).json({
 				error: "Discord token exchange failed"
 			});

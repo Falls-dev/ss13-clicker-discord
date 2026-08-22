@@ -48,9 +48,18 @@ async function discordFetch(path, options) {
 	if (discordState.sessionToken && !opts.headers.Authorization) {
 		opts.headers.Authorization = "Bearer " + discordState.sessionToken;
 	}
-	const urls = [path];
-	if (path.indexOf("/.proxy/") !== 0) {
-		urls.push("/.proxy" + path);
+	const method = String(opts.method || "GET").toUpperCase();
+	const isWrite = method !== "GET" && method !== "HEAD";
+	const urls = [];
+	if (isDiscordActivity()) {
+		if (path.indexOf("/.proxy/") === 0) {
+			urls.push(path);
+		} else {
+			urls.push("/.proxy" + path);
+			if (!isWrite) urls.push(path);
+		}
+	} else {
+		urls.push(path);
 	}
 	let lastError = null;
 	for (let i = 0; i < urls.length; i++) {
@@ -58,8 +67,10 @@ async function discordFetch(path, options) {
 			const response = await fetch(urls[i], opts);
 			if (response.ok || response.status === 409) return response;
 			lastError = new Error(path + " -> " + response.status);
+			if (isWrite) break;
 		} catch (err) {
 			lastError = err;
+			if (isWrite) break;
 		}
 	}
 	throw lastError || new Error("Request failed: " + path);
@@ -207,6 +218,18 @@ export async function initDiscordActivity() {
 		return discordSdk;
 	}
 
+	// Authorize before any other SDK command. Orientation/subscribe before OAuth
+	// makes Discord pop a second permission window that cannot complete.
+	try {
+		await authenticateUser(clientId);
+	} catch (err) {
+		console.warn("[discord] OAuth failed, continuing with saved session if any", err);
+	}
+
+	if (discordState.sessionToken) {
+		await fetchSessionUser();
+	}
+
 	try {
 		await discordSdk.commands.setOrientationLockState({
 			lock_state: Common.OrientationLockStateTypeObject.LANDSCAPE,
@@ -227,40 +250,41 @@ export async function initDiscordActivity() {
 		console.warn("[discord] layout subscribe failed", err);
 	}
 
-	try {
-		await authenticateUser(clientId);
-	} catch (err) {
-		console.warn("[discord] OAuth failed, continuing with saved session if any", err);
-	}
-
-	if (discordState.sessionToken) {
-		await fetchSessionUser();
-	}
-
 	return discordSdk;
 }
 
+let authInFlight = null;
+
 async function authorizeCode(clientId) {
-	const prompts = ["none", "consent"];
-	let lastError = null;
-	for (let i = 0; i < prompts.length; i++) {
-		try {
-			const result = await discordSdk.commands.authorize({
-				client_id: clientId,
-				response_type: "code",
-				state: "",
-				prompt: prompts[i],
-				scope: ["identify"]
-			});
-			if (result && result.code) return result.code;
-		} catch (err) {
-			lastError = err;
-		}
+	const result = await discordSdk.commands.authorize({
+		client_id: clientId,
+		response_type: "code",
+		state: "",
+		prompt: "none",
+		scope: ["identify"]
+	});
+	if (!result || !result.code) {
+		throw new Error("Discord authorize returned no code");
 	}
-	throw lastError || new Error("Discord authorize failed");
+	return result.code;
 }
 
 async function authenticateUser(clientId) {
+	if (authInFlight) return authInFlight;
+	authInFlight = authenticateUserOnce(clientId).finally(function () {
+		authInFlight = null;
+	});
+	return authInFlight;
+}
+
+async function authenticateUserOnce(clientId) {
+	if (discordState.sessionToken) {
+		const existing = await fetchSessionUser();
+		if (existing && existing.id) return existing;
+		discordState.sessionToken = "";
+		persistSession();
+	}
+
 	const code = await authorizeCode(clientId);
 
 	const tokenResponse = await discordFetch("/api/token", {
@@ -270,7 +294,7 @@ async function authenticateUser(clientId) {
 	});
 	const payload = await tokenResponse.json();
 	if (!payload || !payload.access_token) {
-		throw new Error("Token exchange returned no access_token");
+		throw new Error((payload && payload.error) || "Token exchange returned no access_token");
 	}
 	if (payload.session_token) {
 		discordState.sessionToken = payload.session_token;

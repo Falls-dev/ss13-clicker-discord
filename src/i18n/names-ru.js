@@ -199,6 +199,8 @@ export default {
 		"hatCrate2": "Ящик со шляпами, зимнее издание",
 		"knifeCrate": "Оружейный ящик",
 		"supplyCrate": "Грузовая капсула",
+		"revCrate": "Схрон революции",
+		"secCrate": "Ящик СБ",
 		"lavaCrate": "Ящик местного наследия",
 		"syndieCrate": "Капсула синдиката",
 		"cultCrate": "Рунная разрушенная капсула",
@@ -651,5 +653,28 @@ export default {
 		"cargoCombatRoll": "+1 реролл валидхантинга",
 		"upgradeBotany1": "Второй лоток ботаники",
 		"upgradeBotany2": "Третий лоток ботаники"
+	},
+	"actions": {
+		"graytideMoney": "Грузовой отсек",
+		"graytideSeeds": "Ботаника",
+		"graytideMeat": "Медбей",
+		"graytidePower": "Инженерный",
+		"graytideVault": "Хранилище",
+		"graytideSpace": "Космос",
+		"graytideDouble": "Клетка ярости",
+		"graytideChem": "Химия",
+		"graytideScience": "Исследования",
+		"graytideBridge": "Каюта капитана",
+		"graytideMining": "Шахта",
+		"graytideSecurity": "СБ",
+		"clean1": "Забастовка рабочих",
+		"clean2": "Жёсткое СБ",
+		"cleanDorms": "Дормы 3",
+		"clean3": "Ядерная команда синдиката",
+		"clean4": "Культисты кровавой клятвы",
+		"cleanHall": "Центральный главный коридор",
+		"clean5": "Мятежная команда Nanotrasen",
+		"clean6": "«Дипломаты» Федерации магов",
+		"clean7": "Блюспейс-парадокс времени"
 	}
 };

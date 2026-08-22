@@ -33,7 +33,7 @@
         :key="'restriction'+index"
         class="warning-bubble mt-1"
       >{{ $t('inventory.restriction', { what: restriction.toUpperCase() }) }}</span>
-      <span class="description mt-1" v-if="item.description">{{item.description}}</span>
+      <span class="description mt-1" v-if="item.description">{{ $itemDesc(itemId, item.description) }}</span>
       <span class="potion-charges mt-1" v-if="item.potionCharges">{{ $t('inventory.charges', { count: item.potionCharges }) }}</span>
       <span
         class="description mt-1"

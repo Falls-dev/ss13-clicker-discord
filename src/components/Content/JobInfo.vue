@@ -51,7 +51,7 @@ export default {
   computed: {
     displayTitle() {
       const key = "flavor." + this.infoId + ".title";
-      return this.$te(key) ? this.$t(key) : this.title;
+      return this.$te(key, this.$i18n.locale) ? this.$t(key) : this.title;
     },
     filteredOptions() {
       return this.options.filter(option => {

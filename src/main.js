@@ -8,6 +8,7 @@ import store from "@/state/store.js";
 import i18n, { setLocale, detectLocale } from "@/i18n";
 import { initDiscordActivity, discordState, isDiscordActivity, fetchSessionUser } from "@/discord/activity";
 import { hydrateFromCloud, startCloudAutosave } from "@/state/cloudSave";
+import { enableLastSeenPersist } from "@/state/chrono";
 
 import { BPopover } from 'bootstrap-vue'
 Vue.component('b-popover', BPopover)
@@ -54,12 +55,20 @@ function applyLocale() {
 }
 
 async function loadConfig() {
-	try {
-		const cfg = await fetch("/api/config").then(function (r) { return r.json(); });
-		return cfg || {};
-	} catch (err) {
-		return {};
+	const paths = isDiscordActivity()
+		? ["/.proxy/api/config", "/api/config"]
+		: ["/api/config"];
+	for (let i = 0; i < paths.length; i++) {
+		try {
+			const response = await fetch(paths[i]);
+			if (!response.ok) continue;
+			const cfg = await response.json();
+			if (cfg) return cfg;
+		} catch (err) {
+			// try next
+		}
 	}
+	return {};
 }
 
 async function bootDebug(cfg) {
@@ -81,6 +90,11 @@ async function bootDebug(cfg) {
 }
 
 async function boot() {
+	const bootStartedAt = Date.now();
+	const localChrono = {
+		lastLogoutTime: (store.state.chrono && store.state.chrono.lastLogoutTime) || 0,
+		remainingTime: (store.state.chrono && store.state.chrono.remainingTime) || 0
+	};
 	const cfg = await loadConfig();
 	const localPlayer = cfg.localPlayer === true;
 	discordState.localPlayer = localPlayer;
@@ -108,7 +122,7 @@ async function boot() {
 	}
 
 	applyLocale();
-	await hydrateFromCloud(store);
+	await hydrateFromCloud(store, localChrono);
 	if (process.env.NODE_ENV === "production" || !localPlayer) {
 		store.commit("cheats/disableCheats");
 	}
@@ -119,7 +133,8 @@ async function boot() {
 		render: h => h(App),
 	}).$mount('#app')
 
-	store.dispatch('chrono/updateOfflineTime');
+	store.dispatch('chrono/updateOfflineTime', bootStartedAt);
+	enableLastSeenPersist();
 	store.dispatch('research/startupRoll');
 	store.dispatch("cleanup");
 	store.dispatch("_resume");

@@ -152,7 +152,7 @@
         :key="tier"
       >
         <div class="col-12">
-          <span class="type-text text-uppercase">{{typedEntry[0]}}</span>
+          <span class="type-text text-uppercase">{{ $actionType(typedEntry[0]) }}</span>
         </div>
         <div
           class="col-12 col-sm-6 col-lg-4 col-xl-3 col-xxl-2"

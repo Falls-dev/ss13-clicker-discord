@@ -171,12 +171,7 @@ export default {
       return this.$actionVerb(raw);
     },
     actionTitle() {
-      if (this.action.name) return this.$itemName(this.actionId, this.action.name);
-      if (this.action.item) return this.$itemName(this.action.item, this.item && this.item.name);
-      if (this.action.items) return this.$itemName(this.action.items.id, ITEMS[this.action.items.id] && ITEMS[this.action.items.id].name);
-      if (this.action.itemTables)
-        return this.$itemName(this.action.itemTables[0].item, ITEMS[this.action.itemTables[0].item] && ITEMS[this.action.itemTables[0].item].name);
-      return "BAD NAME";
+      return this.$actionLabel(this.actionId, this.action);
     },
     icon() {
       if (this.action.icon) return this.action.icon;

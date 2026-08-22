@@ -8,6 +8,16 @@ import {
 	JOB_INTERVALS
 } from "@/data/chrono";
 
+let persistLastSeen = false;
+
+export function enableLastSeenPersist() {
+	persistLastSeen = true;
+}
+
+export function shouldPersistLastSeen() {
+	return persistLastSeen;
+}
+
 const chrono = {
 	namespaced: true,
 	state: {
@@ -77,6 +87,18 @@ const chrono = {
 		lastGain(state) {
 			return state.lastGain;
 		},
+		lastGainText(state, getters) {
+			let duration = state.lastGain || 0;
+			var seconds = parseInt((duration / 1000) % 60),
+				minutes = parseInt((duration / (1000 * 60)) % 60),
+				hours = parseInt((duration / (1000 * 60 * 60)));
+
+			hours = hours < 10 ? "0" + hours : hours;
+			minutes = minutes < 10 ? "0" + minutes : minutes;
+			seconds = seconds < 10 ? "0" + seconds : seconds;
+
+			return `${hours}:${minutes}:${seconds}`;
+		},
 		previousResetPotential(state, getters, rootState, rootGetters) {
 			return rootGetters["completion/getItem"]('bluetime') || 0;
 		},
@@ -109,6 +131,12 @@ const chrono = {
 			state.remainingTime += val;
 			state.remainingTime = Math.max(state.remainingTime, 0);
 			state.remainingTime = Math.min(state.remainingTime, this.getters["chrono/maxDuration"]);
+		},
+		setLastLogoutTime(state, val) {
+			state.lastLogoutTime = val;
+		},
+		setRemainingTime(state, val) {
+			state.remainingTime = Math.max(0, Math.min(val, this.getters["chrono/maxDuration"]));
 		}
 	},
 	actions: {
@@ -138,12 +166,16 @@ const chrono = {
 				dispatch("_progress", customInterval);
 			}, interval ? interval : 250);
 		},
-		updateOfflineTime({ state, getters, commit }) {
+		updateOfflineTime({ state, getters, commit }, bootStartedAt) {
 			if (!state.lastLogoutTime) return;
-			let elapsedTime = new Date().getTime() - state.lastLogoutTime;
+			const now = typeof bootStartedAt === "number" ? bootStartedAt : Date.now();
+			let elapsedTime = now - state.lastLogoutTime;
+			if (!Number.isFinite(elapsedTime) || elapsedTime < 0) elapsedTime = 0;
+			elapsedTime = Math.min(elapsedTime, getters["maxDuration"]);
 			state.lastGain = elapsedTime;
 			state.lastExport = Math.min(elapsedTime + state.lastExport, Number.MAX_VALUE);
 			commit("addTime", elapsedTime);
+			state.lastLogoutTime = Date.now();
 		},
 		resetLastExport({ state, getters, commit }){
 			state.lastExport = 0;

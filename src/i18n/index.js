@@ -8,6 +8,7 @@ import flavorEn from "./flavor-en";
 import flavorRu from "./flavor-ru";
 import shopDescEn from "./shop-desc-en";
 import shopDescRu from "./shop-desc-ru";
+import itemDescRu from "./item-desc-ru";
 
 Vue.use(VueI18n);
 
@@ -30,8 +31,10 @@ function mergeNames(messages) {
 		items: namesRu.items,
 		enemies: namesRu.enemies,
 		zones: namesRu.zones,
-		purchases: namesRu.purchases,
-		upgrades: namesRu.upgrades
+		purchases: Object.assign({}, namesRu.items, namesRu.purchases),
+		upgrades: namesRu.upgrades,
+		actions: namesRu.actions || {},
+		itemDesc: itemDescRu
 	});
 }
 
@@ -59,10 +62,26 @@ export function setLocale(locale) {
 	}
 }
 
+function localeHas(vm, key) {
+	if (!vm.$i18n || !key) return false;
+	const locale = vm.$i18n.locale;
+	const messages = vm.$i18n.messages && vm.$i18n.messages[locale];
+	if (!messages) return false;
+	const parts = String(key).split(".");
+	let cur = messages;
+	for (let i = 0; i < parts.length; i++) {
+		if (!cur || typeof cur !== "object" || !Object.prototype.hasOwnProperty.call(cur, parts[i])) {
+			return false;
+		}
+		cur = cur[parts[i]];
+	}
+	return typeof cur === "string" || typeof cur === "number";
+}
+
 function lookup(vm, prefix, id, fallback) {
 	if (!id) return fallback || "";
 	const key = prefix + "." + id;
-	if (vm.$i18n && vm.$i18n.locale === "ru" && vm.$te(key)) {
+	if (localeHas(vm, key)) {
 		const translated = vm.$t(key);
 		if (translated && translated !== key) return translated;
 	}
@@ -94,7 +113,7 @@ const UPGRADE_NAME_KEYS = {
 
 function jobName(vm, jobId) {
 	const key = "jobs." + jobId;
-	return vm.$te(key) ? vm.$t(key) : jobId;
+	return localeHas(vm, key) ? vm.$t(key) : jobId;
 }
 
 function jobBlitzRange(purchase) {
@@ -117,7 +136,7 @@ function purchaseDescription(vm, purchaseId, purchase) {
 		return vm.$t(key, values);
 	};
 	const has = function (key) {
-		return vm.$te(key);
+		return localeHas(vm, key);
 	};
 
 	if (purchase.upgrade === "inventorySize") {
@@ -208,8 +227,8 @@ function purchaseDescription(vm, purchaseId, purchase) {
 function purchaseDisplayName(vm, purchaseId, purchase, fallback) {
 	if (!purchase) return fallback || "";
 	const nameKey = "shopDesc." + purchaseId + "Name";
-	if (purchaseId && vm.$te(nameKey)) return vm.$t(nameKey);
-	if (purchase.upgrade && UPGRADE_NAME_KEYS[purchase.upgrade] && vm.$te(UPGRADE_NAME_KEYS[purchase.upgrade])) {
+	if (purchaseId && localeHas(vm, nameKey)) return vm.$t(nameKey);
+	if (purchase.upgrade && UPGRADE_NAME_KEYS[purchase.upgrade] && localeHas(vm, UPGRADE_NAME_KEYS[purchase.upgrade])) {
 		return vm.$t(UPGRADE_NAME_KEYS[purchase.upgrade]);
 	}
 	const blitz = jobBlitzRange(purchase);
@@ -226,11 +245,44 @@ function purchaseDisplayName(vm, purchaseId, purchase, fallback) {
 Vue.prototype.$jobName = function (job) {
 	if (!job) return "";
 	const key = "jobs." + job.id;
-	return this.$te(key) ? this.$t(key) : job.name || job.id;
+	return localeHas(this, key) ? this.$t(key) : job.name || job.id;
 };
 
 Vue.prototype.$itemName = function (id, fallback) {
 	return lookup(this, "items", id, fallback);
+};
+
+Vue.prototype.$itemDesc = function (id, fallback) {
+	if (!id) return fallback || "";
+	const itemKey = "itemDesc." + id;
+	if (localeHas(this, itemKey)) return this.$t(itemKey);
+	const shopKey = "shopDesc." + id;
+	if (localeHas(this, shopKey)) return this.$t(shopKey);
+	return fallback || "";
+};
+
+Vue.prototype.$actionLabel = function (actionId, action) {
+	if (actionId && localeHas(this, "actions." + actionId)) {
+		return this.$t("actions." + actionId);
+	}
+	if (action && action.item) {
+		return this.$itemName(action.item, action.name);
+	}
+	if (action && action.items && action.items.id) {
+		return this.$itemName(action.items.id, action.name);
+	}
+	if (action && action.itemTables && action.itemTables[0] && action.itemTables[0].item) {
+		return this.$itemName(action.itemTables[0].item, action.name);
+	}
+	if (action && action.name) {
+		return this.$itemName(actionId, action.name);
+	}
+	return (action && action.name) || actionId || "";
+};
+
+Vue.prototype.$actionType = function (type) {
+	const key = "action.type." + optionSlug(type);
+	return localeHas(this, key) ? this.$t(key) : type;
 };
 
 Vue.prototype.$enemyName = function (id, fallback) {
@@ -260,18 +312,18 @@ Vue.prototype.$purchaseDisplayName = function (purchaseId, purchase, fallback) {
 
 Vue.prototype.$infoOption = function (name) {
 	const key = "info.option." + optionSlug(name);
-	return this.$te(key) ? this.$t(key) : name;
+	return localeHas(this, key) ? this.$t(key) : name;
 };
 
 Vue.prototype.$equipSlot = function (slot) {
 	const key = "equipment." + slot;
-	return this.$te(key) ? this.$t(key) : slot;
+	return localeHas(this, key) ? this.$t(key) : slot;
 };
 
 Vue.prototype.$actionVerb = function (raw) {
 	if (!raw) return "";
-	const key = "action.verb." + raw;
-	return this.$te(key) ? this.$t(key) : raw;
+	const key = "action.verb." + optionSlug(raw);
+	return localeHas(this, key) ? this.$t(key) : raw;
 };
 
 setLocale(i18n.locale);

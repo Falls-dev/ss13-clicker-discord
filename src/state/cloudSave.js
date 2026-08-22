@@ -15,10 +15,14 @@ export const cloudState = Vue.observable({
 let autosaveTimer = null;
 let lastPushedJson = "";
 
-export async function hydrateFromCloud(store) {
+export async function hydrateFromCloud(store, snapshot) {
+	const localLogout = (snapshot && snapshot.lastLogoutTime) || (store.state.chrono && store.state.chrono.lastLogoutTime) || 0;
+	const localRemaining = (snapshot && typeof snapshot.remainingTime === "number")
+		? snapshot.remainingTime
+		: ((store.state.chrono && store.state.chrono.remainingTime) || 0);
 	if (!getSessionToken()) {
 		cloudState.enabled = false;
-		return { ok: false, reason: "no-session" };
+		return { ok: false, reason: "no-session", lastSeen: localLogout, remaining: localRemaining };
 	}
 	cloudState.enabled = true;
 	cloudState.busy = true;
@@ -27,17 +31,25 @@ export async function hydrateFromCloud(store) {
 		const payload = await response.json();
 		if (payload && payload.save) {
 			store.dispatch("setData", payload.save);
+			const cloudLogout = (payload.save.chrono && payload.save.chrono.lastLogoutTime) || 0;
+			const cloudUpdated = Number(payload.updatedAt) || 0;
+			const cloudSeen = Math.max(cloudLogout, cloudUpdated);
+			const lastSeen = Math.max(localLogout, cloudSeen);
+			if (localLogout >= cloudSeen) {
+				store.commit("chrono/setRemainingTime", localRemaining);
+			}
+			store.commit("chrono/setLastLogoutTime", lastSeen);
 			cloudState.lastSync = payload.updatedAt || Date.now();
 			cloudState.revision = payload.revision || 0;
 			lastPushedJson = JSON.stringify(payload.save);
 			cloudState.error = "";
-			return { ok: true, loaded: true };
+			return { ok: true, loaded: true, lastSeen: lastSeen };
 		}
 		await pushToCloud(store, true);
-		return { ok: true, loaded: false };
+		return { ok: true, loaded: false, lastSeen: localLogout, remaining: localRemaining };
 	} catch (err) {
 		cloudState.error = (err && err.message) || "cloud load failed";
-		return { ok: false, reason: "error" };
+		return { ok: false, reason: "error", lastSeen: localLogout, remaining: localRemaining };
 	} finally {
 		cloudState.busy = false;
 	}
@@ -100,9 +112,13 @@ export function startCloudAutosave(store) {
 	}, 15000);
 
 	window.addEventListener("visibilitychange", function () {
-		if (document.visibilityState === "hidden") pushToCloud(store, true);
+		if (document.visibilityState === "hidden") {
+			store.commit("chrono/setLastLogoutTime", Date.now());
+			pushToCloud(store, true);
+		}
 	});
 	window.addEventListener("pagehide", function () {
+		store.commit("chrono/setLastLogoutTime", Date.now());
 		pushToCloud(store, true);
 	});
 }

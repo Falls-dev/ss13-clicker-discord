@@ -37,7 +37,7 @@ import info from './info';
 import completion from './completion';
 import cheats from './cheats'
 import settings from '@/state/settings';
-import chrono from '@/state/chrono';
+import chrono, { shouldPersistLastSeen } from '@/state/chrono';
 import customization from '@/state/customization';
 import { createMobModule } from "./mob";
 
@@ -122,7 +122,9 @@ export function reducer(state) {
 		}
 	}
 	delete reduced.chrono.currentTimeout;
-	reduced.chrono.lastLogoutTime = new Date().getTime();
+	if (shouldPersistLastSeen()) {
+		reduced.chrono.lastLogoutTime = new Date().getTime();
+	}
 	return reduced;
 }
 

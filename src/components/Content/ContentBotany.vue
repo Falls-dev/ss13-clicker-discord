@@ -23,87 +23,58 @@
 				]"
       >
         <template slot="Back">
-          <span>
-            Before I became a
-            <img class="mx--0" :src="require('@/assets/art/botany/icon.png')" />
-            <b>Botanist</b>, I had a crippling addiction to space weed.
-          </span>
-          <span>
-            Now, I also get to grow cool
-            <img
-              class="mx--2"
-              :src="require('@/assets/art/botany/PlantPepperhot.png')"
-            />
-            <b>Plants</b>.
-          </span>
+          <i18n path="flavor.botany.back1" tag="span">
+            <img class="mx--0" place="icon" :src="require('@/assets/art/botany/icon.png')" />
+            <b place="name">{{ $t('flavor.botany.botanist') }}</b>
+          </i18n>
+          <i18n path="flavor.botany.back2" tag="span">
+            <img class="mx--2" place="icon" :src="require('@/assets/art/botany/PlantPepperhot.png')" />
+            <b place="name">{{ $t('flavor.botany.plants') }}</b>
+          </i18n>
         </template>
         <template slot="Seeds?">
-          <span>
-            Thanks to science, you can grow any type of
-            <img
-              class="mx--2"
-              :src="require('@/assets/art/botany/PlantPepperhot.png')"
-            />
-            <b>Plant</b> from just a single type of Seed.
-          </span>
-          <span>
-            Head down to
-            <img class="mx--0" :src="require('@/assets/art/sidebar/cargo.png')" />
-            <b>Cargo</b> and you can order some, assuming you have the
-            <img
-              class="mx--2"
-              :src="require('@/assets/art/misc/coin-padded.png')"
-            />
-            <b>Cash</b>.
-          </span>
+          <i18n path="flavor.botany.seeds1" tag="span">
+            <img class="mx--2" place="icon" :src="require('@/assets/art/botany/PlantPepperhot.png')" />
+            <b place="name">{{ $t('flavor.botany.plant') }}</b>
+          </i18n>
+          <i18n path="flavor.botany.seeds2" tag="span">
+            <img class="mx--0" place="cargoIcon" :src="require('@/assets/art/sidebar/cargo.png')" />
+            <b place="cargo">{{ $t('flavor.botany.cargo') }}</b>
+            <img class="mx--2" place="cashIcon" :src="require('@/assets/art/misc/coin-padded.png')" />
+            <b place="cash">{{ $t('flavor.botany.cash') }}</b>
+          </i18n>
         </template>
         <template slot="Plants?">
-          <span>
-            Most of the
-            <img class="mx--2" :src="require('@/assets/art/botany/PlantPepperhot.png')" />
-            <b>Plants</b> you'll grow here can be eaten to restore your
-            <img
-              class="mx--0"
-              :src="require('@/assets/art/combat/health.gif')"
-            />
-            <b>Health</b>.
-          </span>
-          <span>
-            While I prefer my produce
-            <i>au naturel</i>, you can also
-            <img class="mx--2" :src="require('@/assets/art/cooking/icon.png')" />
-            <b>Cook</b> it to bring out even more flavor.
-          </span>
+          <i18n path="flavor.botany.plantsHeal" tag="span">
+            <img class="mx--2" place="plantIcon" :src="require('@/assets/art/botany/PlantPepperhot.png')" />
+            <b place="plants">{{ $t('flavor.botany.plants') }}</b>
+            <img class="mx--0" place="hpIcon" :src="require('@/assets/art/combat/health.gif')" />
+            <b place="health">{{ $t('flavor.botany.health') }}</b>
+          </i18n>
+          <i18n path="flavor.botany.cook" tag="span">
+            <i place="natural">{{ $t('flavor.botany.cookNatural') }}</i>
+            <img class="mx--2" place="icon" :src="require('@/assets/art/cooking/icon.png')" />
+            <b place="name">{{ $t('flavor.botany.cookVerb') }}</b>
+          </i18n>
         </template>
         <template slot="Stats?">
           <span>{{ $t('flavor.botany.eat') }}</span>
-          <span>
-            Depending on the
-            <img
-              class="mx--2"
-              :src="require('@/assets/art/botany/PlantPepperhot.png')"
-            />
-            <b>Food</b> you're using, you'll find that some of your
-            <img
-              class="mx--0"
-              :src="require('@/assets/art/combat/precision.png')"
-            />
-            <img class="mx--1" :src="require('@/assets/art/combat/skull.png')" />
-            <img class="mx--2" :src="require('@/assets/art/combat/black_shoes.png')" />
-            <b>Combat Stats</b> will be improved or lowered.
-          </span>
-          <span>
-            These
-            <img class="mx--0" :src="require('@/assets/art/combat/precision.png')" />
-            <img class="mx--1" :src="require('@/assets/art/combat/skull.png')" />
-            <img class="mx--2" :src="require('@/assets/art/combat/black_shoes.png')" />
-            <b>Stat</b> changes will be applied just by having the
-            <img
-              class="mx--2"
-              :src="require('@/assets/art/botany/PlantPepperhot.png')"
-            />
-            <b>Food</b> equipped, even if you aren't eating it. Crazy, huh?
-          </span>
+          <i18n path="flavor.botany.statsFood" tag="span">
+            <img class="mx--2" place="foodIcon" :src="require('@/assets/art/botany/PlantPepperhot.png')" />
+            <b place="food">{{ $t('flavor.botany.food') }}</b>
+            <img class="mx--0" place="s1" :src="require('@/assets/art/combat/precision.png')" />
+            <img class="mx--1" place="s2" :src="require('@/assets/art/combat/skull.png')" />
+            <img class="mx--2" place="s3" :src="require('@/assets/art/combat/black_shoes.png')" />
+            <b place="stats">{{ $t('flavor.botany.combatStats') }}</b>
+          </i18n>
+          <i18n path="flavor.botany.statsEquip" tag="span">
+            <img class="mx--0" place="s1" :src="require('@/assets/art/combat/precision.png')" />
+            <img class="mx--1" place="s2" :src="require('@/assets/art/combat/skull.png')" />
+            <img class="mx--2" place="s3" :src="require('@/assets/art/combat/black_shoes.png')" />
+            <b place="stat">{{ $t('flavor.botany.stat') }}</b>
+            <img class="mx--2" place="foodIcon" :src="require('@/assets/art/botany/PlantPepperhot.png')" />
+            <b place="food">{{ $t('flavor.botany.food') }}</b>
+          </i18n>
         </template>
       </job-info>
 
