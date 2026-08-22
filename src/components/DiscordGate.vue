@@ -2,7 +2,7 @@
   <div class="discord-gate">
     <div class="gate-card">
       <img src="@/assets/art/misc/logo.png" alt="" />
-      <h2>SS13 Idle</h2>
+      <h2>Space Clicker 13</h2>
       <p>{{ $t("gate.body") }}</p>
       <a class="btn btn-primary" href="https://discord.com/invite/HwbK9XQ" @click="openInvite">
         {{ $t("gate.openDiscord") }}

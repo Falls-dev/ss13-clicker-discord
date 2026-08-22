@@ -167,8 +167,8 @@ export default {
       return this.hasActionRequiredItems(this.actionId);
     },
     _actionName() {
-      if (this.action.actionName) return this.action.actionName;
-      return this.actionName;
+      const raw = this.action.actionName || this.actionName;
+      return this.$actionVerb(raw);
     },
     actionTitle() {
       if (this.action.name) return this.$itemName(this.actionId, this.action.name);

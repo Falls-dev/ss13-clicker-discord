@@ -231,6 +231,17 @@ function postSave(req, res) {
 	});
 }
 
+function sendMe(req, res) {
+	res.json({
+		id: req.session.userId,
+		username: req.session.username,
+		global_name: req.session.username,
+		locale: req.session.locale
+	});
+}
+
+app.get("/api/me", requireSession, sendMe);
+app.get("/.proxy/api/me", requireSession, sendMe);
 app.get("/api/save", requireSession, getSave);
 app.get("/.proxy/api/save", requireSession, getSave);
 app.post("/api/save", requireSession, postSave);

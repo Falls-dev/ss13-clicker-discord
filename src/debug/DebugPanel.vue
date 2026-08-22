@@ -83,12 +83,13 @@ export default {
     return {
       open: true,
       cloudState,
+      discordState,
       fileData: null
     };
   },
   computed: {
     userLabel() {
-      const user = discordState.user;
+      const user = this.discordState.user;
       if (!user) return this.$t("debug.guest");
       return (user.global_name || user.username || user.id) + " (" + user.id + ")";
     },

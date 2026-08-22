@@ -49,7 +49,7 @@
           </span>
         </template>
         <template slot="Meat?">
-          <span>You can't-a make an omelette without breaking a few eggs.</span>
+          <span>{{ $t('flavor.cooking.eggs') }}</span>
           <span>
             If you want the freshest-a
             <img

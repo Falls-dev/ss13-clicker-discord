@@ -1,4 +1,4 @@
-# Space Station Idle
+# Space Clicker 13
 
 Игра в стиле Melvor Idle во вселенной Space Station 13. Этот форк запускается как **Discord Activity** на `https://spacestation13clicker.ss13.site`.
 

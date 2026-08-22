@@ -1,7 +1,7 @@
 <template>
   <div :class="{simplified: simplified}">
     <div v-for="(subData, index) in data.itemTables" :key="index">
-      <span>{{(subData.chance*100).toLocaleString()}}% chance for...</span>
+      <span>{{ $t('shop.chanceFor', { chance: (subData.chance * 100).toLocaleString() }) }}</span>
       <div class="sub-table">
         <item-chance-a-b-c
           v-if="subData.item || subData.items"

@@ -1,8 +1,13 @@
 import Vue from "vue";
 import VueI18n from "vue-i18n";
+import { xpFromLevel } from "@/data/experience";
 import en from "./en";
 import ru from "./ru";
 import namesRu from "./names-ru";
+import flavorEn from "./flavor-en";
+import flavorRu from "./flavor-ru";
+import shopDescEn from "./shop-desc-en";
+import shopDescRu from "./shop-desc-ru";
 
 Vue.use(VueI18n);
 
@@ -34,7 +39,10 @@ export const i18n = new VueI18n({
 	locale: detectLocale(),
 	fallbackLocale: "en",
 	silentTranslationWarn: true,
-	messages: { en, ru: mergeNames(ru) }
+	messages: {
+		en: Object.assign({}, en, { flavor: flavorEn, shopDesc: shopDescEn }),
+		ru: mergeNames(Object.assign({}, ru, { flavor: flavorRu, shopDesc: shopDescRu }))
+	}
 });
 
 export function setLocale(locale) {
@@ -47,6 +55,7 @@ export function setLocale(locale) {
 	}
 	if (typeof document !== "undefined") {
 		document.documentElement.lang = next;
+		document.title = "Space Clicker 13";
 	}
 }
 
@@ -61,10 +70,157 @@ function lookup(vm, prefix, id, fallback) {
 }
 
 function optionSlug(name) {
-	return String(name || "")
+	const slug = String(name || "")
 		.replace(/&quot;/g, "")
 		.replace(/[^a-zA-Z0-9]+/g, "_")
 		.replace(/^_|_$/g, "");
+	return slug || "ellipsis";
+}
+
+const UPGRADE_NAME_KEYS = {
+	inventorySize: "shopDesc.inventoryName",
+	miningTools: "shopDesc.upgradeMiningTools",
+	xenobiologyPens: "shopDesc.upgradeXenobioPens",
+	cableManagement: "shopDesc.upgradeCables",
+	fabricationBins: "shopDesc.upgradeMatterBins",
+	researchUpgrade: "shopDesc.upgradePointsBank",
+	graytidingHacking: "shopDesc.upgradeHacking",
+	chemDispenser: "shopDesc.upgradeChem",
+	fryCooking: "shopDesc.upgradeCooking",
+	tinkeringSpirits: "shopDesc.upgradeTinkering",
+	drinkTable: "shopDesc.upgradeBartending",
+	antagUpgrade: "shopDesc.upgradeAntag"
+};
+
+function jobName(vm, jobId) {
+	const key = "jobs." + jobId;
+	return vm.$te(key) ? vm.$t(key) : jobId;
+}
+
+function jobBlitzRange(purchase) {
+	if (!purchase || !purchase.upgrade || purchase.upgrade.indexOf("level") !== 0) return null;
+	if (purchase.upgrade === "level") return null;
+	const jobId = purchase.upgrade.slice(5);
+	if (!jobId) return null;
+	const req = purchase.requiredUpgrades || {};
+	const i = Number(req[purchase.upgrade]);
+	if (Number.isNaN(i)) return null;
+	const from = Math.max(1, i * 10);
+	const to = (i + 1) * 10;
+	const xp = xpFromLevel(to) - xpFromLevel(from) + 1;
+	return { jobId, from, to, xp };
+}
+
+function purchaseDescription(vm, purchaseId, purchase) {
+	if (!purchase) return "";
+	const t = function (key, values) {
+		return vm.$t(key, values);
+	};
+	const has = function (key) {
+		return vm.$te(key);
+	};
+
+	if (purchase.upgrade === "inventorySize") {
+		const from = 10 + ((purchase.requiredUpgrades && purchase.requiredUpgrades.inventorySize) || 0);
+		return t("shopDesc.inventorySize", { from: from, to: from + 1 });
+	}
+
+	const req = purchase.requiredUpgrades || {};
+	const tier = purchase.upgrade != null ? req[purchase.upgrade] : undefined;
+
+	if (purchase.upgrade === "miningTools") {
+		if (!tier) return t("shopDesc.speed", { what: t("shopDesc.miningWhat"), percent: 15 });
+		return t("shopDesc.speedMore", { what: t("shopDesc.miningWhat"), percent: 15, total: 15 * (tier + 1) });
+	}
+	if (purchase.upgrade === "cableManagement") {
+		if (!tier) return t("shopDesc.speed", { what: t("shopDesc.engineeringWhat"), percent: 15 });
+		return t("shopDesc.speedMore", { what: t("shopDesc.engineeringWhat"), percent: 15, total: 15 * (tier + 1) });
+	}
+	if (purchase.upgrade === "antagUpgrade") {
+		if (!tier) return t("shopDesc.speed", { what: t("shopDesc.antagWhat"), percent: 5 });
+		return t("shopDesc.speedMore", { what: t("shopDesc.antagWhat"), percent: 5, total: 5 * (tier + 1) });
+	}
+	if (purchase.upgrade === "fabricationBins") {
+		const percent = 100 - 10 * (tier + 1);
+		if (!tier) return t("shopDesc.fabrication", { percent: percent });
+		return t("shopDesc.fabricationFrom", { percent: percent, from: 100 - 10 * tier });
+	}
+	if (purchase.upgrade === "researchUpgrade") return t("shopDesc.researchUpgrade");
+	if (purchase.upgrade === "graytidingHacking") {
+		if (!tier) return t("shopDesc.graytiding", { percent: 6 });
+		return t("shopDesc.graytidingMore", { percent: 6, total: 6 * (tier + 1) });
+	}
+	if (purchase.upgrade === "chemDispenser") {
+		if (!tier) return t("shopDesc.chemistry", { percent: 15 });
+		return t("shopDesc.chemistryMore", { percent: 15, total: 15 * (tier + 1) });
+	}
+	if (purchase.upgrade === "fryCooking") {
+		if (!tier) return t("shopDesc.cooking", { percent: 15 });
+		return t("shopDesc.cookingMore", { percent: 15, total: 15 * (tier + 1) });
+	}
+	if (purchase.upgrade === "tinkeringSpirits") {
+		const cap = 25 * (tier + 1);
+		if (!tier) return t("shopDesc.tinkering", { step: 3, cap: cap });
+		return t("shopDesc.tinkeringFrom", { step: 3, cap: cap, from: 25 * tier });
+	}
+	if (purchase.upgrade === "drinkTable") {
+		return t("shopDesc.bartending", { step: 4, cap: 5 * (tier + 1) });
+	}
+	if (purchase.upgrade === "xenobiologyPens") {
+		const parts = [];
+		for (let j = 0; j <= tier; j++) {
+			parts.push(t("shopDesc.xenobioYield", { mult: Math.pow(2, tier - j + 1), tier: j + 1 }));
+		}
+		return parts.join(", ");
+	}
+
+	const blitz = jobBlitzRange(purchase);
+	if (blitz) {
+		return t("shopDesc.jobBlitz", {
+			xp: blitz.xp.toLocaleString(),
+			job: jobName(vm, blitz.jobId),
+			from: blitz.from,
+			to: blitz.to
+		});
+	}
+
+	if (purchaseId === "seed10") return t("shopDesc.seedPlain");
+	if (purchaseId && purchaseId.indexOf("seed") === 0) {
+		const discounts = { seed100: 5, seed500: 10, seed2000: 15, seed5000: 20 };
+		if (discounts[purchaseId] != null) return t("shopDesc.seedBulk", { discount: discounts[purchaseId] });
+	}
+	if (purchaseId && purchaseId.indexOf("cape") === 0) {
+		if (purchaseId === "capeShitposting") return t("shopDesc.capeShitposting");
+		if (purchase.requiredLevels) {
+			const jobId = Object.keys(purchase.requiredLevels)[0];
+			return t("shopDesc.capeMax", { job: jobName(vm, jobId) });
+		}
+	}
+	if (purchaseId && purchaseId.indexOf("bossTicket") === 0) return t("shopDesc.bossTicket");
+	if (purchaseId && purchaseId.indexOf("antagRoll") === 0) return t("shopDesc.antagRoll");
+
+	const idKey = "shopDesc." + purchaseId;
+	if (has(idKey)) return t(idKey);
+
+	return purchase.description || "";
+}
+
+function purchaseDisplayName(vm, purchaseId, purchase, fallback) {
+	if (!purchase) return fallback || "";
+	const nameKey = "shopDesc." + purchaseId + "Name";
+	if (purchaseId && vm.$te(nameKey)) return vm.$t(nameKey);
+	if (purchase.upgrade && UPGRADE_NAME_KEYS[purchase.upgrade] && vm.$te(UPGRADE_NAME_KEYS[purchase.upgrade])) {
+		return vm.$t(UPGRADE_NAME_KEYS[purchase.upgrade]);
+	}
+	const blitz = jobBlitzRange(purchase);
+	if (blitz) {
+		return vm.$t("shopDesc.jobBlitzName", {
+			job: jobName(vm, blitz.jobId),
+			from: blitz.from,
+			to: blitz.to
+		});
+	}
+	return fallback || purchase.name || purchaseId;
 }
 
 Vue.prototype.$jobName = function (job) {
@@ -94,6 +250,14 @@ Vue.prototype.$upgradeName = function (id, fallback) {
 	return lookup(this, "upgrades", id, fallback);
 };
 
+Vue.prototype.$purchaseDesc = function (purchaseId, purchase) {
+	return purchaseDescription(this, purchaseId, purchase);
+};
+
+Vue.prototype.$purchaseDisplayName = function (purchaseId, purchase, fallback) {
+	return purchaseDisplayName(this, purchaseId, purchase, fallback);
+};
+
 Vue.prototype.$infoOption = function (name) {
 	const key = "info.option." + optionSlug(name);
 	return this.$te(key) ? this.$t(key) : name;
@@ -102,6 +266,12 @@ Vue.prototype.$infoOption = function (name) {
 Vue.prototype.$equipSlot = function (slot) {
 	const key = "equipment." + slot;
 	return this.$te(key) ? this.$t(key) : slot;
+};
+
+Vue.prototype.$actionVerb = function (raw) {
+	if (!raw) return "";
+	const key = "action.verb." + raw;
+	return this.$te(key) ? this.$t(key) : raw;
 };
 
 setLocale(i18n.locale);

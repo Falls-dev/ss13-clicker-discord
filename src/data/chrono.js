@@ -259,14 +259,17 @@ ALL_JOBS.forEach(job => {
 
 export const SECTIONS = [
 	{
+		id: "chronoExchange",
 		name: "Chrono Exchange",
 		purchases: ["chronoToCash", "chronoToTime", "timeToCash1", "timeToCash2", "antagRoll1", "antagRoll2", "antagRoll3", "antagRoll4"]
 	},
 	{
+		id: "chronoUpgrades",
 		name: "Upgrades",
 		purchases: ["timeBankSize1", "timeBankSize2", "timeBankOptions1", "timeBankOptions2", "timeBankAutoPause", "chronoCombatRoll", "chronoScrying"]
 	},
 	{
+		id: "jobBlitz",
 		name: "Job Blitz",
 		purchases: Object.keys(JOB_PURCHASES)
 	},

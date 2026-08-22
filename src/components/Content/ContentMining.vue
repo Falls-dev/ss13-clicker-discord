@@ -33,7 +33,7 @@
           </span>
         </template>
         <template slot="Mining?">
-          <span>What, you're still here?</span>
+          <span>{{ $t('flavor.mining.stillHere') }}</span>
           <span>
             <img class="mx--0" :src="require('@/assets/art/mining/icon.png')" />
             <b>Mining</b>'s real easy, kid. Just go down there and click on whatever
@@ -79,7 +79,7 @@
             <img class="mx--2" :src="require('@/assets/art/mining/SheetIron.png')" />
             <b>Ore</b>. Not much else to mine.
           </span>
-          <span>What's it used for? You sure do ask a lot of questions.</span>
+          <span>{{ $t('flavor.mining.questions') }}</span>
           <span>
             I think those purple-shirts down at
             <img

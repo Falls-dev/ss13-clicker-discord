@@ -17,29 +17,21 @@
 				]"
       >
         <template slot="Back">
-          <span>I... I can hear you out there. You... you're not a cop, right?</span>
-          <span>That's a relief. Can you do me a favor and uh... don't mention me to anyone else. OK?</span>
+          <span>{{ $t('flavor.inventory.back1') }}</span>
+          <span>{{ $t('flavor.inventory.back2') }}</span>
         </template>
         <template slot="Inventory?">
-          <span>There's a lot of valuables out on the station.</span>
-          <span>If you don't keep your stuff safe, someone might just snatch it up and hide themselves in a locker before you can track them down.</span>
-          <span>
-            If you want more space, the guys down at
-            <img
-              class="mx--0"
-              :src="require('@/assets/art/sidebar/cargo.png')"
-            />
-            <b>Cargo</b> might be able to help you out.
-          </span>
-          <span>
-            Otherwise, you can just
-            <img
-              class="mx--2"
-              :src="require('@/assets/art/misc/coin-padded.png')"
-            />
-            <b>Sell</b> off some of the items you no longer care about.
-          </span>
-          <span>(Shift-clicking an item will quickly sell all of it!)</span>
+          <span>{{ $t('flavor.inventory.money1') }}</span>
+          <span>{{ $t('flavor.inventory.money2') }}</span>
+          <i18n path="flavor.inventory.cargo" tag="span">
+            <img class="mx--0" place="icon" :src="require('@/assets/art/sidebar/cargo.png')" />
+            <b place="name">{{ $t('flavor.inventory.cargoName') }}</b>
+          </i18n>
+          <i18n path="flavor.inventory.sell" tag="span">
+            <img class="mx--2" place="icon" :src="require('@/assets/art/misc/coin-padded.png')" />
+            <b place="name">{{ $t('flavor.inventory.sellName') }}</b>
+          </i18n>
+          <span>{{ $t('flavor.inventory.shiftClick') }}</span>
         </template>
       </job-info>
       <div class="row">

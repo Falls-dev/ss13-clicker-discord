@@ -1,15 +1,15 @@
 <template>
   <b-popover :target="target" triggers="click blur" placement="bottom" delay="30" :customClass="$store.getters['settings/darkModeClass']">
     <div class="d-flex flex-column align-items-center">
-      <p class="title text-uppercase">{{equipmentSlot}}</p>
+      <p class="title text-uppercase">{{ $equipSlot(equipmentSlot) }}</p>
       <equipment-dropdown-item
         class="w-100"
         v-for="(itemId, index) in validItems"
         :key="index"
         :itemId="itemId"
       />
-      <button v-if="canUnequip" class="btn btn-outline-danger" @click="unequip">UNEQUIP</button>
-      <span v-if="!currentItemId && validItems.length == 0">No {{equipmentSlot}} items available.</span>
+      <button v-if="canUnequip" class="btn btn-outline-danger" @click="unequip">{{ $t('shop.unequip') }}</button>
+      <span v-if="!currentItemId && validItems.length == 0">{{ $t('shop.noItems', { slot: $equipSlot(equipmentSlot) }) }}</span>
     </div>
   </b-popover>
 </template>

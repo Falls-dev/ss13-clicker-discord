@@ -1,6 +1,6 @@
-# Space Station Idle
+# Space Clicker 13
 
-Space Station Idle is a web-based idle game based on Melvor Idle, and set in the Space Station 13 universe.
+Space Clicker 13 is a web-based idle game based on Melvor Idle, and set in the Space Station 13 universe.
 
 There's very little public documentation on implementation right now.
 

@@ -197,11 +197,17 @@ import { EventBus } from "@/utils/eventBus.js";
 import ContentAbstract from "@/components/Content/ContentAbstract";
 import { MAX_LEVEL } from "@/data/experience";
 import { setLocale } from "@/i18n";
-import { discordState } from "@/discord/activity";
+import { discordState, getSessionToken } from "@/discord/activity";
 import { cloudState, pushToCloud } from "@/state/cloudSave";
 
 export default {
   extends: ContentAbstract,
+  data() {
+    return {
+      discordState,
+      cloudState
+    };
+  },
   computed: {
     showVirtualLevels: {
       get() {
@@ -290,17 +296,20 @@ export default {
       return this.$i18n.locale;
     },
     cloudStatus() {
-      const user = discordState.user;
-      if (user) {
+      const user = this.discordState.user;
+      const token = getSessionToken() || this.discordState.sessionToken;
+      if (user || token) {
+        const name = user && (user.global_name || user.username || user.id);
         return this.$t("settings.cloudSignedIn", {
-          name: user.global_name || user.username || user.id
+          name: name || this.$t("settings.cloudDiscordUser")
         });
       }
+      if (this.discordState.active) return this.$t("settings.cloudDiscordFailed");
       return this.$t("settings.cloudGuest");
     },
     lastSyncLabel() {
-      if (!cloudState.lastSync) return this.$t("settings.cloudNever");
-      return new Date(cloudState.lastSync).toLocaleString();
+      if (!this.cloudState.lastSync) return this.$t("settings.cloudNever");
+      return new Date(this.cloudState.lastSync).toLocaleString();
     }
   },
   methods: {

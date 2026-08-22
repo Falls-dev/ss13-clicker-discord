@@ -22,7 +22,7 @@
         ]"
       >
         <template slot="Back">
-          <span>Ook?</span>
+          <span>{{ $t('flavor.ling.ook') }}</span>
         </template>
         <template slot="Ook?">
           <span>
@@ -35,10 +35,10 @@
             <img :src="require('@/assets/art/ling/headcrab.png')" class="mx--1" />
             <b>Alien Parasite</b>.
           </span>
-          <span>You can let it in you however you want, but I would advise the mouth or anus. I'd advise you pick one and just go for it. Don't start in one place then give up halfway. You'll regret it.</span>
+          <span>{{ $t('flavor.ling.orifice') }}</span>
         </template>
         <template slot="Cultivate">
-          <span>Find your center and focus inward.</span>
+          <span>{{ $t('flavor.ling.center') }}</span>
           <span>
             You can use foreign
             <img
@@ -48,10 +48,10 @@
             <b>Biomatter</b>
             to assist you. Focus on the tone of the muscle fiber and the twitch of your nerves.
           </span>
-          <span>It will take a while but you can eventually break through to the next level of physical perfection. Don't be discouraged if you don't get it right away.</span>
+          <span>{{ $t('flavor.ling.level') }}</span>
         </template>
         <template slot="Parasite">
-          <span>They are a little red slug, about the size of your forearm.</span>
+          <span>{{ $t('flavor.ling.slug') }}</span>
           <span>
             Security tends to keep a pretty
             <img

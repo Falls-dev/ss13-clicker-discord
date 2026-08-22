@@ -24,8 +24,8 @@
 				]"
       >
         <template slot="Back">
-          <span>Fluorine, Uranium, Carbon, Potassium, Arsenic, Sulfur...</span>
-          <span>I'm sorry, did you need something?</span>
+          <span>{{ $t('flavor.chemistry.elements') }}</span>
+          <span>{{ $t('flavor.chemistry.need') }}</span>
         </template>
         <template slot="Power?">
           <span>
@@ -95,7 +95,7 @@
           </span>
         </template>
         <template slot="Pills?">
-          <span>Keep your voice down.</span>
+          <span>{{ $t('flavor.chemistry.quiet') }}</span>
           <span>
             With the proper
             <img class="mx--2" :src="require('@/assets/art/chemistry/icon.png')" />
@@ -119,7 +119,7 @@
             <img class="mx--2" :src="require('@/assets/art/combat/items/melee_c4.png')" />
             <b>Melee Weapon</b>.
           </span>
-          <span>You didn't hear any of this from me though.</span>
+          <span>{{ $t('flavor.chemistry.secret') }}</span>
           <span></span>
         </template>
       </job-info>

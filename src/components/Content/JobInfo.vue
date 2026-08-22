@@ -6,7 +6,7 @@
           <img class="avatar" :src="icon" />
         </div>
         <div class="d-flex flex-column justify-content-center w-100">
-          <p class="info-title">{{title}}</p>
+          <p class="info-title">{{displayTitle}}</p>
           <div class="slot w-100 d-flex flex-column">
             <slot :name="current" />
           </div>
@@ -49,6 +49,10 @@ export default {
     };
   },
   computed: {
+    displayTitle() {
+      const key = "flavor." + this.infoId + ".title";
+      return this.$te(key) ? this.$t(key) : this.title;
+    },
     filteredOptions() {
       return this.options.filter(option => {
         if (option.name == this.current && option.name == "Back") return false;

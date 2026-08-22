@@ -6,7 +6,7 @@ import '@/assets/DiscordActivity.css';
 
 import store from "@/state/store.js";
 import i18n, { setLocale, detectLocale } from "@/i18n";
-import { initDiscordActivity, discordState, isDiscordActivity } from "@/discord/activity";
+import { initDiscordActivity, discordState, isDiscordActivity, fetchSessionUser } from "@/discord/activity";
 import { hydrateFromCloud, startCloudAutosave } from "@/state/cloudSave";
 
 import { BPopover } from 'bootstrap-vue'
@@ -97,6 +97,9 @@ async function boot() {
 	}
 
 	await initDiscordActivity();
+	if (discordState.sessionToken && !discordState.user) {
+		await fetchSessionUser();
+	}
 	await bootDebug(cfg);
 
 	if (process.env.NODE_ENV === "production") {

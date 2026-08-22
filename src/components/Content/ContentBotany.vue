@@ -76,7 +76,7 @@
           </span>
         </template>
         <template slot="Stats?">
-          <span>They say you are what you eat.</span>
+          <span>{{ $t('flavor.botany.eat') }}</span>
           <span>
             Depending on the
             <img
@@ -141,7 +141,7 @@
 
       <div class="tier row" v-for="(tierEntries, tier) in viewableTieredActions" :key="tier">
         <div class="col-12">
-          <span class="tier-text">TIER {{tier+1}}</span>
+          <span class="tier-text">{{ $t('ui.tier', { n: tier+1 }) }}</span>
         </div>
         <div
           class="col-12 col-sm-6 col-lg-4 col-xl-3 col-xxl-2"

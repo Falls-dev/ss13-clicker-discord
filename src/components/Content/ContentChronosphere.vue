@@ -28,7 +28,7 @@
           </div>
         </template>
         <template slot="Time Bank?">
-          <span>When the simulation is closed, time will continue outside our reality in the "real world".</span>
+          <span>{{ $t('flavor.chronosphere1.closed') }}</span>
           <span>
             All of the time that passes out there will get stored in this
             <img
@@ -37,7 +37,7 @@
             />
             <b>Time Bank</b>.
           </span>
-          <span>We can tap into this lost time, get back to where we should be.</span>
+          <span>{{ $t('flavor.chronosphere1.lost') }}</span>
           <span>
             While using the time stored in the
             <img
@@ -214,7 +214,7 @@
                 </div>
                 <hr />
                 <div class="d-flex flex-row align-items-center justify-content-between">
-                  <span>TOTAL</span>
+                  <span>{{ $t('ui.total') }}</span>
                   <div>
                     <span class="mr-1">+{{$store.getters['chrono/resetPotential']}}</span>
                     <img :src="require('@/assets/art/chrono/bluetime.png')" class="mx--1" />
@@ -222,11 +222,9 @@
                 </div>
               </div>
               <div class="my-2 my-md-0">
-                <p>By resetting the simulation, you'll gain the Bluespace Time listed</p>
-                <p
-                  class="my-1"
-                >This Bluespace Time can be used at the Chrono Shop in all future runs</p>
-                <p>Other than this Bluespace Time, your save data will be wiped clean</p>
+                <p>{{ $t('flavor.chronosphere1.resetGain') }}</p>
+                <p class="my-1">{{ $t('flavor.chronosphere1.resetUse') }}</p>
+                <p>{{ $t('flavor.chronosphere1.resetWipe') }}</p>
                 <div class="reset-container my-2">
                   <shop-purchase purchaseId="resetSimulation" />
                 </div>

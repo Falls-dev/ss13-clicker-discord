@@ -20,7 +20,7 @@
 
     <div class="d-flex flex-column w-100">
       <span class="name">{{displayName}}</span>
-      <span class="description">{{purchase.description}}</span>
+      <span class="description">{{displayDescription}}</span>
       <div v-if="canOpen">
         <button class="my-1 btn btn-primary btn-sm" @click.stop="viewOdds">{{ $t('shop.viewOdds') }}</button>
       </div>
@@ -36,7 +36,7 @@
         >
           {{allJobs[pair[0]]}}
           <img :src="allJobs.find(job => job.id == pair[0]).icon" />
-          <span>lvl{{pair[1]}}</span>
+          <span>{{ $t('shop.lvl', { n: pair[1] }) }}</span>
         </div>
         <div
           v-for="(pair, index) in Object.entries(requiredItems)"
@@ -55,7 +55,7 @@
         <div 
         v-if=purchase.otherText
         class="d-flex flex-row align-items-center mr-1">
-          <span>{{purchase.otherText}}</span>
+          <span>{{ purchase.otherText === 'Hour x1' ? $t('shopDesc.hourX1') : purchase.otherText }}</span>
         </div>
       </div>
     </div>
@@ -101,7 +101,11 @@ export default {
     },
     displayName() {
       const fallback = this.item ? this.$itemName(this.purchase.item, this.name) : this.name;
-      return this.$upgradeName(this.purchaseId, this.$purchaseName(this.purchaseId, fallback));
+      const named = this.$upgradeName(this.purchaseId, this.$purchaseName(this.purchaseId, fallback));
+      return this.$purchaseDisplayName(this.purchaseId, this.purchase, named);
+    },
+    displayDescription() {
+      return this.$purchaseDesc(this.purchaseId, this.purchase);
     },
     canPurchase() {
       return this.$store.getters["inventory/canPurchase"](this.purchase);

@@ -18,92 +18,66 @@
 				]"
       >
         <template slot="Back">
-          <span>Welcome to Cargonia!</span>
-          <span>Are you here to order something, or to join the resistance?</span>
+          <span>{{ $t('flavor.shop.back1') }}</span>
+          <span>{{ $t('flavor.shop.back2') }}</span>
         </template>
         <template slot="Inventory?">
-          <span>
-            Running low on
-            <img class="mx--2" :src="require('@/assets/art/sidebar/backpack.png')" />
-            <b>Inventory Space</b>?
-          </span>
-          <span>I can sell you more, but with the storage on this station being so limited I'll have to charge you more for each extra slot.</span>
+          <i18n path="flavor.shop.inventory1" tag="span">
+            <img class="mx--2" place="icon" :src="require('@/assets/art/sidebar/backpack.png')" />
+            <b place="name">{{ $t('flavor.shop.inventorySpace') }}</b>
+          </i18n>
+          <span>{{ $t('flavor.shop.inventory2') }}</span>
         </template>
         <template slot="Seeds?">
-          <span>
-            You won't make it very far as a
-            <img
-              class="mx--0"
-              :src="require('@/assets/art/botany/icon.png')"
-            />
-            <b>Botanist</b> without any seeds.
-          </span>
-          <span>Order them in bulk, and I'll give you a discount.</span>
+          <i18n path="flavor.shop.seeds1" tag="span">
+            <img class="mx--0" place="icon" :src="require('@/assets/art/botany/icon.png')" />
+            <b place="name">{{ $t('jobs.botany') }}</b>
+          </i18n>
+          <span>{{ $t('flavor.shop.seeds2') }}</span>
         </template>
         <template slot="New Jobs?">
-          <span>
-            Unfortunately, recent budgetary restrictions have left us without the proper equipment to support certain
-            <img
-              class="mx--0"
-              :src="require('@/assets/art/cooking/icon.png')"
-            />
-            <img class="mx--0" :src="require('@/assets/art/xenobio/icon.gif')" />
-            <img class="mx--0" :src="require('@/assets/art/shitposting/icon.png')" />
-            <b>Jobs</b>.
-          </span>
-          <span>With your generous contributions, we could get these departments back up and running at full capacity.</span>
+          <i18n path="flavor.shop.jobs1" tag="span">
+            <span place="icons">
+              <img class="mx--0" :src="require('@/assets/art/cooking/icon.png')" />
+              <img class="mx--0" :src="require('@/assets/art/xenobio/icon.gif')" />
+              <img class="mx--0" :src="require('@/assets/art/shitposting/icon.png')" />
+            </span>
+            <b place="name">{{ $t('flavor.shop.jobsWord') }}</b>
+          </i18n>
+          <span>{{ $t('flavor.shop.jobs2') }}</span>
         </template>
         <template slot="Job Upgrades?">
-          <span>For the right price, I might be able to get you equipped to do your job more efficiently</span>
-          <span>I can't just sell this to anyone though. You'll need to demonstrate that you're experienced in that job first.</span>
-          <span>
-            In fact, for the fancier equipment I'll also need you to prove your
-            <img
-              class="mx--0"
-              :src="require('@/assets/art/validhunting/icon.png')"
-            />
-            <b>Combat Expertise</b>. I can't have these tools falling into the wrong hands.
-          </span>
+          <span>{{ $t('flavor.shop.upgrades1') }}</span>
+          <span>{{ $t('flavor.shop.upgrades2') }}</span>
+          <i18n path="flavor.shop.upgrades3" tag="span">
+            <img class="mx--0" place="icon" :src="require('@/assets/art/validhunting/icon.png')" />
+            <b place="name">{{ $t('flavor.shop.combatExpertise') }}</b>
+          </i18n>
         </template>
 
         <template slot="Capes?">
-          <span>
-            Once you've demonstrated your mastery, I'll be able to order you a
-            <img
-              class="mx--2"
-              :src="require('@/assets/art/combat/items/cloak/capcloak.png')"
-            />
-            <b>Cape</b> for a given job.
-          </span>
-          <span>
-            I've heard rumors that these
-            <img
-              class="mx--2"
-              :src="require('@/assets/art/combat/items/cloak/capcloak.png')"
-            />
-            <b>Capes</b> will work as an extra
-            <img
-              class="mx--0"
-              :src="require('@/assets/art/mining/upgrade1.png')"
-            />
-            <b>Upgrade</b> for that job, but I don't know if I believe that.
-          </span>
+          <i18n path="flavor.shop.capes1" tag="span">
+            <img class="mx--2" place="icon" :src="require('@/assets/art/combat/items/cloak/capcloak.png')" />
+            <b place="name">{{ $t('flavor.shop.cape') }}</b>
+          </i18n>
+          <i18n path="flavor.shop.capes2" tag="span">
+            <img class="mx--2" place="icon" :src="require('@/assets/art/combat/items/cloak/capcloak.png')" />
+            <b place="name">{{ $t('flavor.shop.capesWord') }}</b>
+            <img class="mx--0" place="upgradeIcon" :src="require('@/assets/art/mining/upgrade1.png')" />
+            <b place="upgrade">{{ $t('flavor.shop.upgradeWord') }}</b>
+          </i18n>
         </template>
         <template slot="Gambling?">
-          <span>To be honest with you, I don't even know what's in some of these crates.</span>
-          <span>Of course, that won't stop me from selling them to you.</span>
-          <span>
-            At the very least, you should pick up a
-            <img
-              class="mx--0"
-              :src="require('@/assets/art/shop/items/hatcrate.png')"
-            />
-            <b>Hat Crate</b> at some point; it's the only place you'll find any hats!
-          </span>
+          <span>{{ $t('flavor.shop.gambling1') }}</span>
+          <span>{{ $t('flavor.shop.gambling2') }}</span>
+          <i18n path="flavor.shop.gambling3" tag="span">
+            <img class="mx--0" place="icon" :src="require('@/assets/art/shop/items/hatcrate.png')" />
+            <b place="name">{{ $t('flavor.shop.hatCrate') }}</b>
+          </i18n>
         </template>
         <template slot="Resistance?">
-          <span>You don't know about the resistance?</span>
-          <span>Nevermind then. Forget you heard anything.</span>
+          <span>{{ $t('flavor.shop.resistance1') }}</span>
+          <span>{{ $t('flavor.shop.resistance2') }}</span>
         </template>
       </job-info>
 

@@ -61,8 +61,8 @@
         </template>
 
         <template slot="Money?">
-          <span>I'm gonna pop some tags.</span>
-          <span>Only got twenty dollars in my pocket.</span>
+          <span>{{ $t('flavor.cargonia.tags') }}</span>
+          <span>{{ $t('flavor.cargonia.pocket') }}</span>
           <span>
             Wait you're still here? What are you doing go move
             <img

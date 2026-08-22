@@ -60,6 +60,9 @@ export default {
 		cloudSave: "Облачное сохранение",
 		cloudSignedIn: "Вход: {name}",
 		cloudGuest: "Нет входа — прогресс на этом устройстве, пока не войдёте через Discord Activity",
+		cloudSigningIn: "Вход через Discord…",
+		cloudDiscordFailed: "Вход через Discord не завершился — прогресс только на этом устройстве",
+		cloudDiscordUser: "Discord",
 		cloudLastSync: "Последняя синхронизация: {time}",
 		cloudNever: "никогда",
 		forceSync: "Сохранить в облако сейчас"
@@ -89,7 +92,25 @@ export default {
 		chemReduced: " (СНИЖЕНО ХИМИЕЙ) ",
 		uses: "ТРАТИТ",
 		gives: "ДАЁТ",
-		locked: "ЗАКРЫТО"
+		locked: "ЗАКРЫТО",
+		verb: {
+			GROW: "РАСТИТЬ",
+			MINE: "КОПАТЬ",
+			COOK: "ГОТОВИТЬ",
+			MIX: "МЕШАТЬ",
+			ELECTRIFY: "ЭЛЕКТРИФИЦИРОВАТЬ",
+			FABRICATE: "ФАБРИКОВАТЬ",
+			SYNTHESIZE: "СИНТЕЗИРОВАТЬ",
+			DEVELOP: "РАЗРАБАТЫВАТЬ",
+			GRAYTIDE: "ГРЕЙТАЙДИТЬ",
+			CRAFT: "КРАФТИТЬ",
+			RAISE: "РАСТИТЬ",
+			DISCUSS: "ОБСУЖДАТЬ",
+			SMUGGLE: "КОНТРАБАНДА",
+			PURCHASE: "КУПИТЬ",
+			INVOKE: "ПРИЗВАТЬ",
+			FORM: "ФОРМИРОВАТЬ"
+		}
 	},
 	combat: {
 		title: "Бой",
@@ -175,7 +196,7 @@ export default {
 	},
 	about: {
 		title: "Об игре",
-		p1: "Space Station 13 Idle — игра по мотивам Melvor Idle во вселенной Space Station 13.",
+		p1: "Space Clicker 13 — игра по мотивам Melvor Idle во вселенной Space Station 13.",
 		p2: "Игра полностью бесплатная и с открытым кодом (лицензия AGPL-3.0).",
 		p3: "Хотите помочь — загляните в GitHub репозиторий проекта (опыт программирования не обязателен).",
 		p4: "И заходите на наш Discord-сервер.",
@@ -271,6 +292,10 @@ export default {
 		requires: "Требует:",
 		viewOdds: "Шансы",
 		viewChain: "Цепочка",
+		lvl: "ур.{n}",
+		chanceFor: "{chance}% шанс на...",
+		noItems: "Нет предметов для слота «{slot}».",
+		unequip: "СНЯТЬ",
 		section: {
 			inventoryExpansion: "Расширение инвентаря",
 			megaSeed: "Сервитор MegaSeed",
@@ -278,7 +303,13 @@ export default {
 			jobUpgrades: "Апгрейды работ",
 			combatUpgrades: "Боевые апгрейды",
 			gamble: "Gamble-O-Tron",
-			clothes: "Автомат одежды"
+			clothes: "Автомат одежды",
+			chronoExchange: "Обмен хроно",
+			chronoUpgrades: "Апгрейды",
+			jobBlitz: "Блиц работ",
+			researchRecipes1: "Рецепты исследований I: простые рецепты и инструменты",
+			researchRecipes2: "Рецепты исследований II: маски",
+			researchRecipes3: "Рецепты исследований III: продвинутые рецепты"
 		}
 	},
 	completion: {
@@ -365,7 +396,8 @@ export default {
 			Cuddly_Pets: "Милые питомцы",
 			Ook: "Уук?",
 			Cultivate: "Культивировать",
-			Parasite: "Паразит"
+			Parasite: "Паразит",
+			ellipsis: "..."
 		}
 	},
 	ui: {
@@ -373,7 +405,9 @@ export default {
 		upgradeLeft: "Апгрейд включён (слева)",
 		upgradeRight: "Апгрейд включён (справа)",
 		uniqueDrinks: "Уникальные напитки:",
-		bonus: "Бонус:"
+		bonus: "Бонус:",
+		tier: "ЯРУС {n}",
+		total: "ИТОГО"
 	}
 };
 

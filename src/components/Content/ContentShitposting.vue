@@ -23,16 +23,16 @@
 				]"
       >
         <template slot="Back">
-          <span>This kills tactical chairs. Running behind chairs that are pointed up to obscure your character, making it harder to hit. Yes, i am serious.</span>
+          <span>{{ $t('flavor.shitposting.chairs') }}</span>
         </template>
         <template slot="Shitposting?">
-          <span>This is just like, George Orwell's book, nineteen eighty four.</span>
+          <span>{{ $t('flavor.shitposting.orwell') }}</span>
         </template>
         <template slot="OK?">
-          <span>When they say "people are just going to do [x]" they really mean "I am going to do [x] specifically because this change pisses me off as a form of protest"</span>
+          <span>{{ $t('flavor.shitposting.protest') }}</span>
         </template>
         <template slot="I'm leaving now">
-          <span>It's not your codebase. It's our codebase. You can imply soft power as much as you want, but you don't have it. Division between the server and project is absolute. I'm not interested in reading dezzmont platitudes for the billionth time and won't be checking back in this thread.</span>
+          <span>{{ $t('flavor.shitposting.codebase') }}</span>
         </template>
       </job-info>
 

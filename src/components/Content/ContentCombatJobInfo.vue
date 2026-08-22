@@ -1,6 +1,6 @@
 <template>
   <job-info
-    infoId="REPLACEME"
+    infoId="combat"
     :icon="require('@/assets/art/jobinfo/combat.png')"
     title="Fred Best the Head of Security says..."
     :options="[
@@ -32,10 +32,10 @@
         />
         <b>Massive Eldritch Abomination</b>.
       </span>
-      <span>As long as you keep hitting your enemy, they'll go sideways eventually.</span>
+      <span>{{ $t('flavor.combat.back1') }}</span>
     </template>
     <template slot="Equipment?">
-      <span>Most battles are determined before the fight actually begins.</span>
+      <span>{{ $t('flavor.combat.equipment1') }}</span>
       <span>
         If you want to be a succesful killer, you'll need to go in well
         <img
@@ -300,7 +300,7 @@
         <img class="mx--2" :src="require('@/assets/art/combat/black_shoes.png')" />
         <b>Primary Stats</b>.
       </span>
-      <span>Doing so will give you a small increase in that stat, as well as allow you to gain experience in that skill.</span>
+      <span>{{ $t('flavor.combat.focus1') }}</span>
       <span>
         The amount of experience you gain is based on your damage dealt to the
         <img
@@ -401,7 +401,7 @@
       </span>
     </template>
     <template slot="Bosses?">
-      <span>Looking for a challenge?</span>
+      <span>{{ $t('flavor.combat.bosses1') }}</span>
       <span>
         Once you've collected enough
         <img
@@ -454,13 +454,13 @@
       </span>
     </template>
     <template slot="Legality?">
-      <span>Most of what you fight isn't even human.</span>
+      <span>{{ $t('flavor.combat.legality1') }}</span>
       <span>
         And for the
         <img class="mx--2" :src="require('@/assets/art/combat/enemies/goodclown.png')" />
         <b>Human Enemies</b>?
       </span>
-      <span>Well, just write it off as escalation. That's what I do anyway.</span>
+      <span>{{ $t('flavor.combat.legality2') }}</span>
     </template>
   </job-info>
 </template>

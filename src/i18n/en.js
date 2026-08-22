@@ -60,6 +60,9 @@ export default {
 		cloudSave: "Cloud save",
 		cloudSignedIn: "Signed in as {name}",
 		cloudGuest: "Not signed in — progress stays on this device until Discord Activity login",
+		cloudSigningIn: "Signing in through Discord…",
+		cloudDiscordFailed: "Discord login did not finish — progress stays on this device",
+		cloudDiscordUser: "Discord",
 		cloudLastSync: "Last sync: {time}",
 		cloudNever: "never",
 		forceSync: "Save to cloud now"
@@ -89,7 +92,25 @@ export default {
 		chemReduced: " (CHEM REDUCED) ",
 		uses: "USES",
 		gives: "GIVES",
-		locked: "LOCKED"
+		locked: "LOCKED",
+		verb: {
+			GROW: "GROW",
+			MINE: "MINE",
+			COOK: "COOK",
+			MIX: "MIX",
+			ELECTRIFY: "ELECTRIFY",
+			FABRICATE: "FABRICATE",
+			SYNTHESIZE: "SYNTHESIZE",
+			DEVELOP: "DEVELOP",
+			GRAYTIDE: "GRAYTIDE",
+			CRAFT: "CRAFT",
+			RAISE: "RAISE",
+			DISCUSS: "DISCUSS",
+			SMUGGLE: "SMUGGLE",
+			PURCHASE: "PURCHASE",
+			INVOKE: "INVOKE",
+			FORM: "FORM"
+		}
 	},
 	combat: {
 		title: "Combat",
@@ -175,7 +196,7 @@ export default {
 	},
 	about: {
 		title: "About",
-		p1: "Space Station 13 Idle is a game inspired by Melvor Idle, set in the Space Station 13 universe.",
+		p1: "Space Clicker 13 is a game inspired by Melvor Idle, set in the Space Station 13 universe.",
 		p2: "This game is 100% free and open source (AGPL-3.0 License).",
 		p3: "If you want to contribute, head on down to the project's GitHub Repository (no programming experience is required).",
 		p4: "Also, check out our Discord Server.",
@@ -271,6 +292,10 @@ export default {
 		requires: "Requires:",
 		viewOdds: "View Odds",
 		viewChain: "View Chain",
+		lvl: "lvl{n}",
+		chanceFor: "{chance}% chance for...",
+		noItems: "No {slot} items available.",
+		unequip: "UNEQUIP",
 		section: {
 			inventoryExpansion: "Inventory Expansion",
 			megaSeed: "MegaSeed Servitor",
@@ -278,7 +303,13 @@ export default {
 			jobUpgrades: "Job Upgrades",
 			combatUpgrades: "Combat Upgrades",
 			gamble: "Gamble-O-Tron",
-			clothes: "Clothes Vendo-Matic"
+			clothes: "Clothes Vendo-Matic",
+			chronoExchange: "Chrono Exchange",
+			chronoUpgrades: "Upgrades",
+			jobBlitz: "Job Blitz",
+			researchRecipes1: "Research Recipes I: Simple Recipes & Tools",
+			researchRecipes2: "Research Recipes II: Facewear",
+			researchRecipes3: "Research Recipes III: Advanced Recipes"
 		}
 	},
 	completion: {
@@ -365,7 +396,8 @@ export default {
 			Cuddly_Pets: "Cuddly Pets",
 			Ook: "Ook?",
 			Cultivate: "Cultivate",
-			Parasite: "Parasite"
+			Parasite: "Parasite",
+			ellipsis: "..."
 		}
 	},
 	ui: {
@@ -373,6 +405,8 @@ export default {
 		upgradeLeft: "Upgrade Enabled (Left)",
 		upgradeRight: "Upgrade Enabled (Right)",
 		uniqueDrinks: "Unique Drinks:",
-		bonus: "Bonus:"
+		bonus: "Bonus:",
+		tier: "TIER {n}",
+		total: "TOTAL"
 	}
 };

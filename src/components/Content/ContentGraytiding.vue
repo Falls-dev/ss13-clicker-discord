@@ -30,12 +30,12 @@
             <b>Graytiding</b>. isn't a
             <i>real</i> job.
           </span>
-          <span>And you know what? They're right.</span>
-          <span>It's not a job; it's an art.</span>
+          <span>{{ $t('flavor.graytiding.right') }}</span>
+          <span>{{ $t('flavor.graytiding.art') }}</span>
         </template>
         <template slot="&quot;Graytiding&quot;?">
-          <span>Us assistants, or "Grayshirts", don't have the privilege of departmental funding.</span>
-          <span>So how do we close the gap? It's simple; we just take what we need from the other departments for ourselves.</span>
+          <span>{{ $t('flavor.graytiding.funding') }}</span>
+          <span>{{ $t('flavor.graytiding.take') }}</span>
           <span>
             <img class="mx--0" :src="require('@/assets/art/jobinfo/shitcurity.png')" />
             <b>Some</b> may call it theft, but others recognize it for the art it is as
@@ -84,7 +84,7 @@
           </span>
         </template>
         <template slot="Risk?">
-          <span>What we're doing here may not exactly be legal in the eyes of the law.</span>
+          <span>{{ $t('flavor.graytiding.legal') }}</span>
           <span>
             If you get caught, our friends at
             <img
@@ -119,11 +119,24 @@
           </span>
         </template>
         <template slot="&quot;Cleaning&quot;?">
-          <span>Some <img class="mx--0" :src="require('@/assets/art/graytiding/icon.png')" /> <b>Graytiders</b> have been able to disguise themselves as janitorial staff.</span>
-          <span>While people are very alert to Graytiders, they are completely blind to the humble <img class="mx--0" :src="require('@/assets/art/jobinfo/janitor.png')" /> <b>Janitor</b>.</span>
-          <span>It's such a good disguise that you can <img class="mx--0" :src="require('@/assets/art/chemistry/lube.png')" /><b>Slip</b> into active combat situations while "cleaning" and take what you need. This is super dangerous though, so be extra cautious.</span>
-          <span>I could lend you my disguise, but you'll absolutely need some <img class="mx--0" :src="require('@/assets/art/research/galoshes.png')" /><b>Galoshes</b> if you even want to attempt it.
-             Try asking <img class="mx--0" :src="require('@/assets/art/research/researchJobIcon.png')" /><b>Research</b> for some.</span>
+          <i18n path="flavor.graytiding.disguise" tag="span">
+            <img class="mx--0" place="icon" :src="require('@/assets/art/graytiding/icon.png')" />
+            <b place="name">{{ $t('flavor.graytiding.graytiders') }}</b>
+          </i18n>
+          <i18n path="flavor.graytiding.blind" tag="span">
+            <img class="mx--0" place="icon" :src="require('@/assets/art/jobinfo/janitor.png')" />
+            <b place="name">{{ $t('flavor.graytiding.janitor') }}</b>
+          </i18n>
+          <i18n path="flavor.graytiding.slip" tag="span">
+            <img class="mx--0" place="icon" :src="require('@/assets/art/chemistry/lube.png')" />
+            <b place="name">{{ $t('flavor.graytiding.slipName') }}</b>
+          </i18n>
+          <i18n path="flavor.graytiding.galoshes" tag="span">
+            <img class="mx--0" place="icon" :src="require('@/assets/art/research/galoshes.png')" />
+            <b place="name">{{ $t('flavor.graytiding.galoshesName') }}</b>
+            <img class="mx--0" place="researchIcon" :src="require('@/assets/art/research/researchJobIcon.png')" />
+            <b place="research">{{ $t('flavor.graytiding.researchName') }}</b>
+          </i18n>
         </template>
       </job-info>
 

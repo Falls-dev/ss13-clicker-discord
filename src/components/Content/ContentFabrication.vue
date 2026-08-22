@@ -24,8 +24,8 @@
 				]"
       >
         <template slot="Back">
-          <span>Listen man, I'm going to be upfront with you; I don't actually know how any of this stuff works.</span>
-          <span>I just press some buttons and let the fabricator do its thing.</span>
+          <span>{{ $t('flavor.fabrication.upfront') }}</span>
+          <span>{{ $t('flavor.fabrication.buttons') }}</span>
         </template>
         <template slot="Resources?">
           <span>

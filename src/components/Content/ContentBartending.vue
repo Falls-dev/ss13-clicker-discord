@@ -36,7 +36,7 @@
               <i>Singulo</i>
             </b>.
           </span>
-          <span>If you aren't intimidated by the machinery, you're ready.</span>
+          <span>{{ $t('flavor.bartending.ready') }}</span>
         </template>
         <template slot="Drinks?">
           <span>
@@ -49,7 +49,7 @@
           </span>
         </template>
         <template slot="Mixing?">
-          <span>Yeah. So as you get more skilled, you'll learn how to make more complicated things.</span>
+          <span>{{ $t('flavor.bartending.skill') }}</span>
           <span>
             I, for one, can make you just about anything. How's about a
             <img

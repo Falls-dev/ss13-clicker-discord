@@ -83,7 +83,7 @@ export default {
         let jobLevel = this.$store.getters[jobId + "/level"];
         return {
           icon: job.icon,
-          text: "lvl" + requiredLevel,
+          text: this.$t("shop.lvl", { n: requiredLevel }),
           class: jobLevel >= requiredLevel ? "alert-success" : "alert-danger"
         };
       });

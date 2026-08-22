@@ -25,13 +25,13 @@
 				]"
       >
         <template slot="Back">
-          <span>You look a bit puzzzled, chimpanzzzee-descendent citizzzen.</span>
+          <span>{{ $t('flavor.xenobiology.puzzled') }}</span>
           <span>
             <img class="mx--1" :src="require('@/assets/art/xenobio/icon.gif')" />
             <b>Xenobiology</b> is a hazzzardous place, it's a crazzzy idea to come in here without specializzzed knowledge of this zzzone.
           </span>
-          <span>Don't worry, I sympathizzze with your situation, and would be abuzzz to help organizzze some instructions for you.</span>
-          <span>You'll be amazzzed to see how much of a breezzze this is to pick up.</span>
+          <span>{{ $t('flavor.xenobiology.help') }}</span>
+          <span>{{ $t('flavor.xenobiology.breeze') }}</span>
         </template>
         <template slot="Slimes?">
           <span>
@@ -157,13 +157,13 @@
           </span>
         </template>
         <template slot="Z?">
-          <span>Don't be a buzzzkill; it's not very jazzzed of you to agonizzze my bizzzare speech pattern.</span>
+          <span>{{ $t('flavor.xenobiology.buzzkill') }}</span>
         </template>
       </job-info>
 
       <div class="tier row" v-for="(tierEntries, tier) in viewableTieredActions" :key="tier">
         <div class="col-12">
-          <span class="tier-text">TIER {{tier+1}}</span>
+          <span class="tier-text">{{ $t('ui.tier', { n: tier+1 }) }}</span>
         </div>
         <div
           class="col-12 col-sm-6 col-lg-4 col-xl-3 col-xxl-2"

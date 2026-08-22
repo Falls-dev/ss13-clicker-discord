@@ -73,6 +73,71 @@ export function getSessionToken() {
 	return discordState.sessionToken || "";
 }
 
+const SESSION_STORAGE_KEY = "space-clicker-13-session";
+
+function normalizeUser(user) {
+	if (!user) return null;
+	const id = user.id || user.userId;
+	if (!id) return null;
+	return {
+		id: String(id),
+		username: user.username || "",
+		global_name: user.global_name || user.globalName || user.display_name || "",
+		locale: user.locale || ""
+	};
+}
+
+function persistSession() {
+	if (typeof window === "undefined") return;
+	try {
+		window.sessionStorage.setItem(
+			SESSION_STORAGE_KEY,
+			JSON.stringify({
+				sessionToken: discordState.sessionToken || "",
+				user: discordState.user
+			})
+		);
+	} catch (err) {
+		// ignore
+	}
+}
+
+function restoreSession() {
+	if (typeof window === "undefined") return;
+	try {
+		const raw = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
+		if (!raw) return;
+		const data = JSON.parse(raw);
+		if (data.sessionToken) discordState.sessionToken = data.sessionToken;
+		const user = normalizeUser(data.user);
+		if (user) discordState.user = user;
+	} catch (err) {
+		// ignore
+	}
+}
+
+function setDiscordUser(user) {
+	const next = normalizeUser(user);
+	if (!next) return;
+	discordState.user = next;
+	persistSession();
+}
+
+export async function fetchSessionUser() {
+	if (!discordState.sessionToken) return null;
+	try {
+		const response = await discordFetch("/api/me");
+		const payload = await response.json();
+		if (payload && payload.id) {
+			setDiscordUser(payload);
+			return payload;
+		}
+	} catch (err) {
+		// Session expired or the API is unreachable.
+	}
+	return discordState.user;
+}
+
 async function resolveClientId() {
 	try {
 		const response = await discordFetch("/api/config");
@@ -108,6 +173,7 @@ export async function initDiscordActivity() {
 
 	applyDiscordClass();
 	discordState.active = true;
+	restoreSession();
 
 	const clientId = await resolveClientId();
 	if (!clientId) {
@@ -162,25 +228,40 @@ export async function initDiscordActivity() {
 	}
 
 	try {
-		const auth = await authenticateUser(clientId);
-		if (auth && auth.user) {
-			discordState.user = auth.user;
-		}
+		await authenticateUser(clientId);
 	} catch (err) {
-		console.warn("[discord] OAuth failed, continuing as guest", err);
+		console.warn("[discord] OAuth failed, continuing with saved session if any", err);
+	}
+
+	if (discordState.sessionToken) {
+		await fetchSessionUser();
 	}
 
 	return discordSdk;
 }
 
+async function authorizeCode(clientId) {
+	const prompts = ["none", "consent"];
+	let lastError = null;
+	for (let i = 0; i < prompts.length; i++) {
+		try {
+			const result = await discordSdk.commands.authorize({
+				client_id: clientId,
+				response_type: "code",
+				state: "",
+				prompt: prompts[i],
+				scope: ["identify"]
+			});
+			if (result && result.code) return result.code;
+		} catch (err) {
+			lastError = err;
+		}
+	}
+	throw lastError || new Error("Discord authorize failed");
+}
+
 async function authenticateUser(clientId) {
-	const { code } = await discordSdk.commands.authorize({
-		client_id: clientId,
-		response_type: "code",
-		state: "",
-		prompt: "none",
-		scope: ["identify"]
-	});
+	const code = await authorizeCode(clientId);
 
 	const tokenResponse = await discordFetch("/api/token", {
 		method: "POST",
@@ -193,14 +274,25 @@ async function authenticateUser(clientId) {
 	}
 	if (payload.session_token) {
 		discordState.sessionToken = payload.session_token;
+		persistSession();
 	}
 	if (payload.user) {
-		discordState.user = payload.user;
+		setDiscordUser(payload.user);
 	}
 
-	return discordSdk.commands.authenticate({
-		access_token: payload.access_token
-	});
+	try {
+		const auth = await discordSdk.commands.authenticate({
+			access_token: payload.access_token
+		});
+		if (auth && auth.user) {
+			setDiscordUser(Object.assign({}, payload.user || {}, auth.user));
+		}
+		return auth;
+	} catch (err) {
+		// Session + /users/@me payload is enough for cloud save and Settings.
+		console.warn("[discord] SDK authenticate() failed; using server session", err);
+		return payload;
+	}
 }
 
 export async function openExternalLink(url) {

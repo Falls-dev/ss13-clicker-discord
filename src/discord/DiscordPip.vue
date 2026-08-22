@@ -3,7 +3,7 @@
     <div class="pip-card">
       <img class="pip-logo" src="@/assets/art/misc/logo-square.png" alt="" />
       <div class="pip-copy">
-        <div class="pip-title">SS13 Idle</div>
+        <div class="pip-title">Space Clicker 13</div>
         <div class="pip-user" v-if="userName">{{ userName }}</div>
         <div class="pip-status">{{ statusText }}</div>
         <div class="pip-meta">
@@ -23,9 +23,12 @@ import { discordState } from "@/discord/activity";
 
 export default {
   name: "DiscordPip",
+  data() {
+    return { discordState };
+  },
   computed: {
     userName() {
-      const user = discordState.user;
+      const user = this.discordState.user;
       if (!user) return "";
       return user.global_name || user.username || "";
     },

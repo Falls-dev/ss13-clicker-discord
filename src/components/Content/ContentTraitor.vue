@@ -40,8 +40,8 @@
           </span>
         </template>
         <template slot="Telecrystal?">
-          <span>You get twenty of them.</span>
-          <span>Spend them however you want in your uplink below, because you're not getting more.</span>
+          <span>{{ $t('flavor.traitor.twenty') }}</span>
+          <span>{{ $t('flavor.traitor.spend') }}</span>
           <span>
             I know they are ugly but you have to use
             <img

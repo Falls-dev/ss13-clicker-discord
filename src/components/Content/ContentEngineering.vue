@@ -24,7 +24,7 @@
         <template slot="Back">
           <span>...</span>
           <span>...</span>
-          <span>Hmm? Oh no I wasn't sleeping, I was just... resting my eyes.</span>
+          <span>{{ $t('flavor.engineering.sleep') }}</span>
         </template>
         <template slot="Generating Power?">
           <span>
@@ -47,7 +47,7 @@
             <img class="mx--2" :src="require('@/assets/art/botany/PlantPotatobattery.png')" />
             <b>Plants</b>, you name it.
           </span>
-          <span>For a smooth-brain like yourself? Maybe the stationary bicycle is more your speed.</span>
+          <span>{{ $t('flavor.engineering.bike') }}</span>
         </template>
         <template slot="Uses For Power?">
           <span>

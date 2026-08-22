@@ -4,7 +4,7 @@
     <div class="sidebar-content">
       <div class="sidebar-title p-3 mb-2">
         <img class="no-pixel" src="@/assets/art/misc/logo.png" alt />
-        <span>SS13 Idle</span>
+        <span>Space Clicker 13</span>
       </div>
       <p class="items-header">{{version}}</p>
 
