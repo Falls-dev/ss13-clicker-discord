@@ -20,6 +20,12 @@
               <h6>{{ $t('settings.cloudSave') }}</h6>
               <p class="mb-1">{{ cloudStatus }}</p>
               <p class="mb-1">{{ $t('settings.cloudLastSync', { time: lastSyncLabel }) }}</p>
+              <button
+                v-if="showRetryLogin"
+                type="button"
+                class="btn btn-secondary my-1 d-block"
+                @click="retryLogin"
+              >{{ $t('settings.retryLogin') }}</button>
               <button type="button" class="btn btn-primary my-1 d-block" @click="forceCloudSave">{{ $t('settings.forceSync') }}</button>
             </div>
             <button
@@ -197,7 +203,7 @@ import { EventBus } from "@/utils/eventBus.js";
 import ContentAbstract from "@/components/Content/ContentAbstract";
 import { MAX_LEVEL } from "@/data/experience";
 import { setLocale } from "@/i18n";
-import { discordState, getSessionToken } from "@/discord/activity";
+import { discordState, getSessionToken, retryDiscordLogin } from "@/discord/activity";
 import { cloudState, pushToCloud } from "@/state/cloudSave";
 
 export default {
@@ -310,12 +316,26 @@ export default {
     lastSyncLabel() {
       if (!this.cloudState.lastSync) return this.$t("settings.cloudNever");
       return new Date(this.cloudState.lastSync).toLocaleString();
+    },
+    showRetryLogin() {
+      if (!this.discordState.active) return false;
+      return !(this.discordState.user || getSessionToken() || this.discordState.sessionToken);
     }
   },
   methods: {
     setLang(locale) {
       setLocale(locale);
       this.$store.commit("settings/setLocale", locale);
+    },
+    async retryLogin() {
+      try {
+        await retryDiscordLogin();
+        if (getSessionToken() || this.discordState.sessionToken) {
+          pushToCloud(this.$store, true);
+        }
+      } catch (err) {
+        EventBus.$emit("toast", { text: this.$t("settings.cloudDiscordFailed"), duration: 3000 });
+      }
     },
     forceCloudSave() {
       pushToCloud(this.$store, false);

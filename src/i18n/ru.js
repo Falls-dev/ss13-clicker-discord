@@ -65,7 +65,8 @@ export default {
 		cloudDiscordUser: "Discord",
 		cloudLastSync: "Последняя синхронизация: {time}",
 		cloudNever: "никогда",
-		forceSync: "Сохранить в облако сейчас"
+		forceSync: "Сохранить в облако сейчас",
+		retryLogin: "Повторить вход через Discord"
 	},
 	cheats: {
 		title: "ЧИТЫ",
@@ -264,6 +265,10 @@ export default {
 		bobbah: "За помощь с данными /tg/station",
 		firstTester: "Первый тестировщик",
 		secondTesters: "Вторая волна тестировщиков"
+	},
+	partner: {
+		darkParadise: "Попробуйте Dark Paradise — сервер без гнёта администрации сс1984 и без самодурства!",
+		tgmc: "TGMC — сервер в стиле Space Station 13, где морпехи сражаются против ксеноморфов! Мы ждём вас"
 	},
 	toast: {
 		tutorialsReset: "Подсказки сброшены!",

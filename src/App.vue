@@ -66,7 +66,7 @@ export default {
     if (!this.$store.state.update4Seen) {
       this.$modal.show(ModalUpdate, {}, { height: "auto", width: "360px" });
       this.$store.state.update4Seen = true;
-    } else if (this.$store.getters["chrono/lastGain"] > 30 * 1000 || this.$store.getters["chrono/oldExport"]) {
+    } else if (this.$store.getters["chrono/showWelcomeBack"]) {
       this.$modal.show(
         ModalWelcomeBack,
         {},

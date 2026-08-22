@@ -184,6 +184,7 @@
                 :customClass="active ? 'progress-bar-animated' : ''"
               />
               <span class="mt-1 max">MAX: {{maxHours}} HOURS</span>
+              <partner-ad />
             </div>
           </div>
         </div>
@@ -253,6 +254,7 @@ import ContentAbstract from "@/components/Content/ContentAbstract";
 import ProgressBar from "@/components/ProgressBar";
 import ShopSection from "@/components/Content/Shop/ShopSection";
 import ShopPurchase from "@/components/Content/Shop/ShopPurchase";
+import PartnerAd from "@/components/PartnerAd";
 import {
   SECTIONS,
   BASE_BONUS,
@@ -278,7 +280,7 @@ function createAuditSection(name, percent, intervals) {
 
 export default {
   extends: ContentAbstract,
-  components: { ProgressBar, ShopSection, ShopPurchase },
+  components: { ProgressBar, ShopSection, ShopPurchase, PartnerAd },
   data() {
     return {
       tab: "bank"

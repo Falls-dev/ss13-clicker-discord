@@ -18,6 +18,18 @@ export function shouldPersistLastSeen() {
 	return persistLastSeen;
 }
 
+function formatDuration(duration) {
+	var seconds = parseInt((duration / 1000) % 60),
+		minutes = parseInt((duration / (1000 * 60)) % 60),
+		hours = parseInt((duration / (1000 * 60 * 60)));
+
+	hours = hours < 10 ? "0" + hours : hours;
+	minutes = minutes < 10 ? "0" + minutes : minutes;
+	seconds = seconds < 10 ? "0" + seconds : seconds;
+
+	return `${hours}:${minutes}:${seconds}`;
+}
+
 const chrono = {
 	namespaced: true,
 	state: {
@@ -26,6 +38,7 @@ const chrono = {
 		currentTimeout: 0,
 		lastLogoutTime: 0,
 		lastGain: 0,
+		lastAway: 0,
 		lastExport: 0
 	},
 	getters: {
@@ -71,33 +84,24 @@ const chrono = {
 			return getters["remainingTime"] > 0 || rootGetters["cheats/infiniteChrono"];
 		},
 		remainingTimeText(state, getters) {
-			let duration = getters["remainingTime"];
-			// let date = new Date(duration)
-			// let hours = `0${}`
-			var seconds = parseInt((duration / 1000) % 60),
-				minutes = parseInt((duration / (1000 * 60)) % 60),
-				hours = parseInt((duration / (1000 * 60 * 60)));
-
-			hours = hours < 10 ? "0" + hours : hours;
-			minutes = minutes < 10 ? "0" + minutes : minutes;
-			seconds = seconds < 10 ? "0" + seconds : seconds;
-
-			return `${hours}:${minutes}:${seconds}`;
+			return formatDuration(getters["remainingTime"]);
 		},
 		lastGain(state) {
 			return state.lastGain;
 		},
+		lastAway(state) {
+			return state.lastAway || 0;
+		},
 		lastGainText(state, getters) {
-			let duration = state.lastGain || 0;
-			var seconds = parseInt((duration / 1000) % 60),
-				minutes = parseInt((duration / (1000 * 60)) % 60),
-				hours = parseInt((duration / (1000 * 60 * 60)));
-
-			hours = hours < 10 ? "0" + hours : hours;
-			minutes = minutes < 10 ? "0" + minutes : minutes;
-			seconds = seconds < 10 ? "0" + seconds : seconds;
-
-			return `${hours}:${minutes}:${seconds}`;
+			const cap = getters["maxDuration"];
+			const duration = Math.min(Math.max(0, state.lastGain || 0), cap);
+			return formatDuration(duration);
+		},
+		showWelcomeBack(state) {
+			return (state.lastAway || 0) >= 60 * 1000;
+		},
+		showPartnerAd(state) {
+			return (state.lastAway || 0) >= 2 * 60 * 60 * 1000;
 		},
 		previousResetPotential(state, getters, rootState, rootGetters) {
 			return rootGetters["completion/getItem"]('bluetime') || 0;
@@ -171,10 +175,12 @@ const chrono = {
 			const now = typeof bootStartedAt === "number" ? bootStartedAt : Date.now();
 			let elapsedTime = now - state.lastLogoutTime;
 			if (!Number.isFinite(elapsedTime) || elapsedTime < 0) elapsedTime = 0;
-			elapsedTime = Math.min(elapsedTime, getters["maxDuration"]);
-			state.lastGain = elapsedTime;
+			state.lastAway = elapsedTime;
+			const room = Math.max(0, getters["maxDuration"] - state.remainingTime);
+			const added = Math.min(elapsedTime, room, getters["maxDuration"]);
+			state.lastGain = added;
 			state.lastExport = Math.min(elapsedTime + state.lastExport, Number.MAX_VALUE);
-			commit("addTime", elapsedTime);
+			commit("addTime", added);
 			state.lastLogoutTime = Date.now();
 		},
 		resetLastExport({ state, getters, commit }){

@@ -6,13 +6,16 @@
     <span>{{gainText}}</span>
     <span class="mt-2 description">{{ $t('modal.welcomeTime') }}</span>
     <span>{{remainingTimeText}}</span>
+    <partner-ad />
     <span v-if="oldExport"><br><b class="chrono">{{ $t('modal.welcomeExport') }}</b></span>
     <button class="btn btn-primary mt-3" @click="confirmationClicked">{{ $t('modal.ok') }}</button>
   </div>
 </template>
 
 <script>
+import PartnerAd from "@/components/PartnerAd";
 export default {
+  components: { PartnerAd },
   computed: {
     remainingTimeText() {
       return this.$store.getters["chrono/remainingTimeText"];

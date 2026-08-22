@@ -10,9 +10,10 @@ dotenv.config({ path: path.join(__dirname, "..", ".env") });
 
 const PORT = Number(process.env.PORT || 4443);
 const HOST = process.env.HOST || "127.0.0.1";
-const CLIENT_ID =
-	process.env.DISCORD_CLIENT_ID || process.env.VUE_APP_DISCORD_CLIENT_ID || "";
-const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || "";
+const CLIENT_ID = String(
+	process.env.DISCORD_CLIENT_ID || process.env.VUE_APP_DISCORD_CLIENT_ID || ""
+).trim();
+const CLIENT_SECRET = String(process.env.DISCORD_CLIENT_SECRET || "").trim();
 const LOCAL_PLAYER = String(process.env.LOCAL_PLAYER || "") === "1";
 const DEBUG_REQUESTED = String(process.env.DEBUG || "") === "1";
 const DEBUG = DEBUG_REQUESTED && LOCAL_PLAYER;
@@ -107,6 +108,7 @@ function sanitizeSave(save) {
 const app = express();
 app.disable("x-powered-by");
 app.use(express.json({ limit: "8mb" }));
+app.use(express.urlencoded({ extended: true }));
 
 app.use(function (req, res, next) {
 	const origin = req.headers.origin;
@@ -137,13 +139,27 @@ function sendConfig(_req, res) {
 	res.json(cfg);
 }
 
+async function parseDiscordJson(response) {
+	const text = await response.text();
+	try {
+		return JSON.parse(text);
+	} catch (err) {
+		return {
+			error: "non_json",
+			error_description: String(text || "").slice(0, 180)
+		};
+	}
+}
+
 async function exchangeToken(req, res) {
 	if (!CLIENT_ID || !CLIENT_SECRET) {
+		console.warn("[ss13-idle] Token exchange missing CLIENT_ID or CLIENT_SECRET");
 		return res.status(500).json({
 			error: "Server is missing DISCORD_CLIENT_ID or DISCORD_CLIENT_SECRET"
 		});
 	}
-	if (!req.body || !req.body.code) {
+	const code = req.body && (req.body.code || req.body.Code);
+	if (!code) {
 		return res.status(400).json({ error: "Missing OAuth code" });
 	}
 
@@ -153,31 +169,40 @@ async function exchangeToken(req, res) {
 				client_id: CLIENT_ID,
 				client_secret: CLIENT_SECRET,
 				grant_type: "authorization_code",
-				code: req.body.code
+				code: String(code)
 			}, extra || {});
 			const response = await fetch("https://discord.com/api/oauth2/token", {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/x-www-form-urlencoded"
+					"Content-Type": "application/x-www-form-urlencoded",
+					"User-Agent": "DiscordBot (https://spacestation13clicker.ss13.site, 1.4.3)"
 				},
 				body: new URLSearchParams(params)
 			});
-			const payload = await response.json();
+			const payload = await parseDiscordJson(response);
 			return { response: response, payload: payload };
 		}
 
-		// Discord Activities register https://127.0.0.1 as a placeholder redirect.
-		// Try official (no redirect), then that placeholder, then the Activity origin.
+		// Activity OAuth codes are bound to the portal placeholder https://127.0.0.1.
+		// A mismatch often comes back as invalid_grant; keep trying other redirect_uri
+		// values because Discord does not always consume the code on redirect errors.
 		const redirectTries = [
-			{},
 			{ redirect_uri: "https://127.0.0.1" },
-			{ redirect_uri: "https://" + CLIENT_ID + ".discordsays.com" }
+			{ redirect_uri: "http://127.0.0.1" },
+			{ redirect_uri: "https://" + CLIENT_ID + ".discordsays.com" },
+			{}
 		];
 		let exchanged = { response: { ok: false, status: 0 }, payload: {} };
 		for (let i = 0; i < redirectTries.length; i++) {
 			exchanged = await requestDiscordToken(redirectTries[i]);
 			if (exchanged.response.ok && exchanged.payload && exchanged.payload.access_token) break;
-			if (exchanged.payload && exchanged.payload.error === "invalid_grant") break;
+			console.warn(
+				"[ss13-idle] token try",
+				i,
+				exchanged.response.status,
+				exchanged.payload && exchanged.payload.error,
+				exchanged.payload && exchanged.payload.error_description
+			);
 		}
 		const payload = exchanged.payload;
 		if (!exchanged.response.ok || !payload.access_token) {
@@ -193,10 +218,14 @@ async function exchangeToken(req, res) {
 		}
 
 		const meResponse = await fetch("https://discord.com/api/users/@me", {
-			headers: { Authorization: "Bearer " + payload.access_token }
+			headers: {
+				Authorization: "Bearer " + payload.access_token,
+				"User-Agent": "DiscordBot (https://spacestation13clicker.ss13.site, 1.4.3)"
+			}
 		});
-		const user = await meResponse.json();
+		const user = await parseDiscordJson(meResponse);
 		if (!meResponse.ok || !user.id) {
+			console.warn("[ss13-idle] /users/@me failed", meResponse.status, user && user.message);
 			return res.status(502).json({ error: "Failed to fetch Discord user" });
 		}
 
@@ -212,6 +241,7 @@ async function exchangeToken(req, res) {
 			}
 		});
 	} catch (err) {
+		console.warn("[ss13-idle] Discord token exchange exception", err && err.message);
 		return res.status(502).json({ error: "Discord token exchange failed" });
 	}
 }

@@ -11,7 +11,8 @@ export const discordState = Vue.observable({
 	sessionToken: "",
 	layoutMode: LAYOUT_FOCUSED,
 	debug: false,
-	localPlayer: false
+	localPlayer: false,
+	authError: ""
 });
 
 let discordSdk = null;
@@ -57,6 +58,9 @@ async function discordFetch(path, options) {
 		} else {
 			urls.push("/.proxy" + path);
 			if (!isWrite) urls.push(path);
+			if (isWrite && path.indexOf("/api/token") === 0) {
+				urls.push("https://spacestation13clicker.ss13.site" + path);
+			}
 		}
 	} else {
 		urls.push(path);
@@ -67,10 +71,11 @@ async function discordFetch(path, options) {
 			const response = await fetch(urls[i], opts);
 			if (response.ok || response.status === 409) return response;
 			lastError = new Error(path + " -> " + response.status);
-			if (isWrite) break;
+			if (isWrite && response.status !== 404 && response.status !== 405) break;
 		} catch (err) {
 			lastError = err;
-			if (isWrite) break;
+			if (isWrite && urls.length === i + 1) break;
+			if (isWrite && path.indexOf("/api/token") !== 0) break;
 		}
 	}
 	throw lastError || new Error("Request failed: " + path);
@@ -100,14 +105,17 @@ function normalizeUser(user) {
 
 function persistSession() {
 	if (typeof window === "undefined") return;
+	const payload = JSON.stringify({
+		sessionToken: discordState.sessionToken || "",
+		user: discordState.user
+	});
 	try {
-		window.sessionStorage.setItem(
-			SESSION_STORAGE_KEY,
-			JSON.stringify({
-				sessionToken: discordState.sessionToken || "",
-				user: discordState.user
-			})
-		);
+		window.localStorage.setItem(SESSION_STORAGE_KEY, payload);
+	} catch (err) {
+		// ignore
+	}
+	try {
+		window.sessionStorage.setItem(SESSION_STORAGE_KEY, payload);
 	} catch (err) {
 		// ignore
 	}
@@ -115,13 +123,33 @@ function persistSession() {
 
 function restoreSession() {
 	if (typeof window === "undefined") return;
+	const stores = [window.localStorage, window.sessionStorage];
+	for (let i = 0; i < stores.length; i++) {
+		try {
+			const raw = stores[i].getItem(SESSION_STORAGE_KEY);
+			if (!raw) continue;
+			const data = JSON.parse(raw);
+			if (data.sessionToken) discordState.sessionToken = data.sessionToken;
+			const user = normalizeUser(data.user);
+			if (user) discordState.user = user;
+			if (discordState.sessionToken) return;
+		} catch (err) {
+			// ignore
+		}
+	}
+}
+
+function clearSession() {
+	discordState.sessionToken = "";
+	discordState.user = null;
+	if (typeof window === "undefined") return;
 	try {
-		const raw = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
-		if (!raw) return;
-		const data = JSON.parse(raw);
-		if (data.sessionToken) discordState.sessionToken = data.sessionToken;
-		const user = normalizeUser(data.user);
-		if (user) discordState.user = user;
+		window.localStorage.removeItem(SESSION_STORAGE_KEY);
+	} catch (err) {
+		// ignore
+	}
+	try {
+		window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
 	} catch (err) {
 		// ignore
 	}
@@ -222,7 +250,9 @@ export async function initDiscordActivity() {
 	// makes Discord pop a second permission window that cannot complete.
 	try {
 		await authenticateUser(clientId);
+		discordState.authError = "";
 	} catch (err) {
+		discordState.authError = (err && err.message) || "oauth-failed";
 		console.warn("[discord] OAuth failed, continuing with saved session if any", err);
 	}
 
@@ -280,9 +310,11 @@ async function authenticateUser(clientId) {
 async function authenticateUserOnce(clientId) {
 	if (discordState.sessionToken) {
 		const existing = await fetchSessionUser();
-		if (existing && existing.id) return existing;
-		discordState.sessionToken = "";
-		persistSession();
+		if (existing && existing.id) {
+			discordState.authError = "";
+			return existing;
+		}
+		clearSession();
 	}
 
 	const code = await authorizeCode(clientId);
@@ -293,13 +325,12 @@ async function authenticateUserOnce(clientId) {
 		body: JSON.stringify({ code })
 	});
 	const payload = await tokenResponse.json();
-	if (!payload || !payload.access_token) {
+	if (!payload || !payload.access_token || !payload.session_token) {
 		throw new Error((payload && payload.error) || "Token exchange returned no access_token");
 	}
-	if (payload.session_token) {
-		discordState.sessionToken = payload.session_token;
-		persistSession();
-	}
+	discordState.sessionToken = payload.session_token;
+	discordState.authError = "";
+	persistSession();
 	if (payload.user) {
 		setDiscordUser(payload.user);
 	}
@@ -313,10 +344,17 @@ async function authenticateUserOnce(clientId) {
 		}
 		return auth;
 	} catch (err) {
-		// Session + /users/@me payload is enough for cloud save and Settings.
 		console.warn("[discord] SDK authenticate() failed; using server session", err);
 		return payload;
 	}
+}
+
+export async function retryDiscordLogin() {
+	if (!discordSdk) return null;
+	const clientId = await resolveClientId();
+	if (!clientId) throw new Error("Missing Discord client id");
+	clearSession();
+	return authenticateUser(clientId);
 }
 
 export async function openExternalLink(url) {
