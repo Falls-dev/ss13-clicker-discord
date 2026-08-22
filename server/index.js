@@ -152,16 +152,28 @@ async function parseDiscordJson(response) {
 }
 
 async function exchangeToken(req, res) {
+	console.warn("[auth] /api/token hit", {
+		path: req.path,
+		origin: req.headers.origin || "",
+		contentType: req.headers["content-type"] || "",
+		hasBody: Boolean(req.body),
+		bodyKeys: req.body ? Object.keys(req.body) : []
+	});
 	if (!CLIENT_ID || !CLIENT_SECRET) {
-		console.warn("[ss13-idle] Token exchange missing CLIENT_ID or CLIENT_SECRET");
+		console.warn("[auth] missing CLIENT_ID or CLIENT_SECRET", {
+			clientIdLen: CLIENT_ID.length,
+			secretLen: CLIENT_SECRET.length
+		});
 		return res.status(500).json({
 			error: "Server is missing DISCORD_CLIENT_ID or DISCORD_CLIENT_SECRET"
 		});
 	}
 	const code = req.body && (req.body.code || req.body.Code);
 	if (!code) {
+		console.warn("[auth] missing oauth code", { bodyType: typeof req.body });
 		return res.status(400).json({ error: "Missing OAuth code" });
 	}
+	console.warn("[auth] exchanging code", { codeLen: String(code).length, codePrefix: String(code).slice(0, 4) });
 
 	try {
 		async function requestDiscordToken(extra) {
@@ -193,25 +205,28 @@ async function exchangeToken(req, res) {
 			{}
 		];
 		let exchanged = { response: { ok: false, status: 0 }, payload: {} };
+		let usedTry = -1;
 		for (let i = 0; i < redirectTries.length; i++) {
 			exchanged = await requestDiscordToken(redirectTries[i]);
-			if (exchanged.response.ok && exchanged.payload && exchanged.payload.access_token) break;
-			console.warn(
-				"[ss13-idle] token try",
-				i,
-				exchanged.response.status,
-				exchanged.payload && exchanged.payload.error,
-				exchanged.payload && exchanged.payload.error_description
-			);
+			console.warn("[auth] token try", {
+				i: i,
+				redirect: redirectTries[i].redirect_uri || "(none)",
+				status: exchanged.response.status,
+				error: exchanged.payload && exchanged.payload.error,
+				error_description: exchanged.payload && exchanged.payload.error_description
+			});
+			if (exchanged.response.ok && exchanged.payload && exchanged.payload.access_token) {
+				usedTry = i;
+				break;
+			}
 		}
 		const payload = exchanged.payload;
 		if (!exchanged.response.ok || !payload.access_token) {
-			console.warn(
-				"[ss13-idle] Discord token exchange failed",
-				exchanged.response.status,
-				payload && payload.error,
-				payload && payload.error_description
-			);
+			console.warn("[auth] Discord token exchange failed", {
+				status: exchanged.response.status,
+				error: payload && payload.error,
+				error_description: payload && payload.error_description
+			});
 			return res.status(502).json({
 				error: "Discord token exchange failed"
 			});
@@ -230,6 +245,11 @@ async function exchangeToken(req, res) {
 		}
 
 		const session_token = db.createSession(user);
+		console.warn("[auth] token exchange ok", {
+			userId: user.id,
+			username: user.username,
+			usedTry: usedTry
+		});
 		return res.json({
 			access_token: payload.access_token,
 			session_token,
@@ -241,9 +261,15 @@ async function exchangeToken(req, res) {
 			}
 		});
 	} catch (err) {
-		console.warn("[ss13-idle] Discord token exchange exception", err && err.message);
+		console.warn("[auth] Discord token exchange exception", err && err.message, err && err.stack);
 		return res.status(502).json({ error: "Discord token exchange failed" });
 	}
+}
+
+function receiveAuthLog(req, res) {
+	const line = req.body || {};
+	console.warn("[auth-client]", line.t || "", line.msg || "", JSON.stringify(line.data || {}));
+	return res.json({ ok: true });
 }
 
 app.get("/api/health", function (_req, res) {
@@ -253,6 +279,8 @@ app.get("/api/config", sendConfig);
 app.get("/.proxy/api/config", sendConfig);
 app.post("/api/token", exchangeToken);
 app.post("/.proxy/api/token", exchangeToken);
+app.post("/api/auth-log", receiveAuthLog);
+app.post("/.proxy/api/auth-log", receiveAuthLog);
 
 function getSave(req, res) {
 	const current = db.getSave(req.session.userId);
@@ -348,6 +376,11 @@ server.listen(PORT, HOST, function () {
 		console.warn("[ss13-idle] DEBUG ignored because LOCAL_PLAYER is off");
 	}
 	console.log("[ss13-idle] LOCAL_PLAYER=" + (LOCAL_PLAYER ? "1 (browser allowed)" : "0 (Discord only)"));
+	console.warn("[auth] env", {
+		clientIdLen: CLIENT_ID.length,
+		secretLen: CLIENT_SECRET.length,
+		behindProxy: BEHIND_PROXY
+	});
 	if (!CLIENT_ID || !CLIENT_SECRET) {
 		console.warn("[ss13-idle] Set DISCORD_CLIENT_ID and DISCORD_CLIENT_SECRET in .env");
 	}

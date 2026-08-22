@@ -66,7 +66,8 @@ export default {
 		cloudLastSync: "Last sync: {time}",
 		cloudNever: "never",
 		forceSync: "Save to cloud now",
-		retryLogin: "Try Discord login again"
+		retryLogin: "Try Discord login again",
+		authLog: "Temporary login log (send this if Discord login fails)"
 	},
 	cheats: {
 		title: "CHEATS",

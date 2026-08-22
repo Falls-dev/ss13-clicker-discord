@@ -21,10 +21,16 @@ const ADS = [
 
 export default {
   name: "PartnerAd",
+  props: {
+    force: {
+      type: Boolean,
+      default: false
+    }
+  },
   computed: {
     ad() {
-      if (!this.$store.getters["chrono/showPartnerAd"]) return null;
-      const away = this.$store.getters["chrono/lastAway"] || 0;
+      if (!this.force && !this.$store.getters["chrono/showPartnerAd"]) return null;
+      const away = this.$store.getters["chrono/lastAway"] || Date.now();
       const pick = ADS[Math.abs(Math.floor(away / 60000)) % ADS.length];
       return {
         text: this.$t("partner." + pick.id),

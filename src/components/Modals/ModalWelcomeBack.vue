@@ -6,8 +6,7 @@
     <span>{{gainText}}</span>
     <span class="mt-2 description">{{ $t('modal.welcomeTime') }}</span>
     <span>{{remainingTimeText}}</span>
-    <partner-ad />
-    <span v-if="oldExport"><br><b class="chrono">{{ $t('modal.welcomeExport') }}</b></span>
+    <partner-ad force />
     <button class="btn btn-primary mt-3" @click="confirmationClicked">{{ $t('modal.ok') }}</button>
   </div>
 </template>
@@ -22,9 +21,6 @@ export default {
     },
     gainText() {
       return this.$store.getters["chrono/lastGainText"];
-    },
-    oldExport() {
-      return this.$store.getters["chrono/oldExport"];
     }
   },
   methods: {

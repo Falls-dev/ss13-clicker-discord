@@ -66,7 +66,8 @@ export default {
 		cloudLastSync: "Последняя синхронизация: {time}",
 		cloudNever: "никогда",
 		forceSync: "Сохранить в облако сейчас",
-		retryLogin: "Повторить вход через Discord"
+		retryLogin: "Повторить вход через Discord",
+		authLog: "Временный лог входа (скиньте его, если вход не проходит)"
 	},
 	cheats: {
 		title: "ЧИТЫ",
